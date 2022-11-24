@@ -42,6 +42,10 @@ langs: "en:English,sk:Slovenčina"
 []{.sk}
 :::
 
+## Zemiak
+
+12345
+
 ## Fluchta
 
 6789

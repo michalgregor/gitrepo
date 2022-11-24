@@ -42,6 +42,10 @@ langs: "en:English,sk:Slovenčina"
 []{.sk}
 :::
 
+## Fluchta
+
+6789
+
 ## [Classification]{.en} [Klasifikácia]{.sk}
 [{{heading1}}]{.subtitle}
 

@@ -1,0 +1,3228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <title>D1: Explorative Data Analysis D1: Exploratívna analýza dát</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="./reveal/reveal.js/css/reset.css">
+  <link rel="stylesheet" href="./reveal/reveal.js/css/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+    }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
+  </style>
+  <link rel="stylesheet" href="reveal/uniza_theme/luiza.css" id="theme">
+  <link rel="stylesheet" href="reveal/custom.css"/>
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? './reveal/reveal.js/css/print/pdf.css' : './reveal/reveal.js/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+
+    function updateURLParameter(url, param, paramVal) {
+        var TheAnchor = null;
+        var newAdditionalURL = "";
+        var tempArray = url.split("?");
+        var baseURL = tempArray[0];
+        var additionalURL = tempArray[1];
+        var temp = "";
+
+        if (additionalURL) {
+            var tmpAnchor = additionalURL.split("#");
+            var TheParams = tmpAnchor[0];
+                TheAnchor = tmpAnchor[1];
+            if(TheAnchor)
+                additionalURL = TheParams;
+
+            tempArray = additionalURL.split("&");
+
+            for (var i=0; i<tempArray.length; i++)
+            {
+                if(tempArray[i].split('=')[0] != param)
+                {
+                    newAdditionalURL += temp + tempArray[i];
+                    temp = "&";
+                }
+            }        
+        }
+        else {
+            var tmpAnchor = baseURL.split("#");
+            var TheParams = tmpAnchor[0];
+                TheAnchor  = tmpAnchor[1];
+
+            if(TheParams)
+                baseURL = TheParams;
+        }
+
+        if(TheAnchor)
+            paramVal += "#" + TheAnchor;
+
+        var rows_txt = temp + "" + param + "=" + paramVal;
+        return baseURL + "?" + newAdditionalURL + rows_txt;
+    }
+  </script>
+  <!--[if lt IE 9]>
+  <script src="./reveal/reveal.js/lib/js/html5shiv.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+<section class="frontslide slide" id="title-slide">
+  <h1 class="title "><span class="en">D1: Explorative Data
+Analysis</span> <span class="sk">D1: Exploratívna analýza
+dát</span></h1>
+  <span class="subtitle"><span class="en">Computer Vision</span> <span
+class="sk">Fundamentals of Data Analysis</span></span>
+<div class="columns">
+<div class="column intro-left-column">
+<div class="intro-left-column-inner">
+    <div class="author">
+            <div class="author-name">Michal Gregor</div>
+                    <div class="author-email">michal.gregor@uniza.sk</div>
+                            <div class="author-affiliation"><span class="en">
+<div>
+Department of Control
+</div>
+<div style="margin-bottom:15px">
+and Information Systems
+</div>
+<div>
+University of Žilina
+</div>
+</span> <span class="sk">
+<div>
+Katedra riadiacich
+</div>
+<div style="margin-bottom:15px">
+a informačných systémov
+</div>
+<div>
+Žilinská univerzita
+</div>
+</span></div>
+                </div>
+  <div class="intro-left"><p style="margin-top: 50px;">
+<img src="modules/feit_logo.svg" class="inline-img" style="height:100px" />
+<span
+class="en"><img src="modules/luiza_logo_full_en.svg" class="inline-img" style="height:85px" /></span>
+<span
+class="sk"><img src="modules/luiza_logo_full.svg" class="inline-img" style="height:85px" /></span>
+</p></div>
+</div>
+</div><div class="column intro-right-column">
+    <div class="intro-right-column-inner"><img src="modules/luiza_intro.png" style="height: 400px; margin-top: 30px; margin-bottom: 70px;"></div>
+</div>
+</div>
+</section>
+
+<section>
+<section id="data-analysis-the-process-analýza-dát-proces"
+class="title-slide slide level1 empty">
+<h1 class="empty"><span class="en">Data Analysis: The Process</span>
+<span class="sk">Analýza dát: proces</span></h1>
+<p><img data-src="images/data/eda/assoc.svg" style="width:40.0%" /></p>
+</section>
+<section id="data-analysis-the-steps-dátová-analýza-jednotlivé-kroky"
+class="title-slide slide level2">
+<h2><span class="en">Data Analysis: The Steps</span> <span
+class="sk">Dátová analýza: jednotlivé kroky</span></h2>
+<p><span class="subtitle"><span><span class="en">Data Analysis: The
+Process</span> <span class="sk">Analýza dát:
+proces</span></span></span></p>
+<div class="space-before">
+<div class="en">
+<p><img data-src="images/data/data_analysis_1.svg" data-only="1"
+style="width:80.0%" /> <img data-src="images/data/data_analysis_2.svg"
+data-only="2" style="width:80.0%" /></p>
+</div>
+<div class="sk">
+<p><img data-src="images/data/data_analysis_1_sk.svg" data-only="1"
+style="width:80.0%" /> <img
+data-src="images/data/data_analysis_2_sk.svg" data-only="2"
+style="width:80.0%" /></p>
+</div>
+</div>
+<div class="space-before" data-onslide="2-">
+<ul>
+<li id="section">
+<span class="en">Unfortunately, the steps are not easy to order.</span>
+<span class="sk">Kroky nanešťastie nie je ľahké zoradiť.</span>
+</li>
+<li id="section">
+<span class="en">You will often need to jump back and forth among
+them.</span> <span class="sk">Často bude medzi nimi treba hore dolu
+preskakovať.</span>
+</li>
+</ul>
+</div>
+<div class="space-before15" data-only="3-">
+<ul>
+<li id="section">
+<span class="en">E.g. after exploratory analysis one might find out
+that:</span> <span class="sk">Napr. po exploratívnej analýze sa môže
+ukázať, že:</span>
+<div class="spread05 space-before05">
+<ul>
+<li id="section">
+<span class="en">Some crucial data is missing and needs to be
+acquired.</span> <span class="sk">Nejaké kľúčové dáta chýbajú a musia sa
+zozbierať.</span>
+</li>
+<li id="section">
+<span class="en">Portions of the data are corrupted and need to be
+corrected, cleaned, etc.</span> <span class="sk">Časť dá je poškodená a
+musí sa opraviť, vyčistiť atď.</span>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="space-before15" data-only="4-">
+<ul>
+<li id="section">
+<span class="en">Evaluation might yield unacceptable results and:</span>
+<span class="sk">Výsledky vyhodnotenia môžu byť neuspokojivé a:</span>
+<div class="spread05 space-before05">
+<ul>
+<li id="section">
+<span class="en">A different kind of model might be necessary;</span>
+<span class="sk">Treba použiť iný druh modelu;</span>
+</li>
+<li id="section">
+<span class="en">The preprocessing stage might need to be
+modified;</span> <span class="sk">Musí sa modifikovať
+predspracovanie;</span>
+</li>
+<li id="section">
+…
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</section>
+
+<section id="asking-a-question-položiť-si-otázku"
+class="title-slide slide level2">
+<h2><span class="en">Asking a Question</span> <span class="sk">Položiť
+si otázku</span></h2>
+<p><span class="subtitle"><span><span class="en">Data Analysis: The
+Process</span> <span class="sk">Analýza dát:
+proces</span></span></span></p>
+<div class="columns">
+<div class="column spread05 space-before1" style="width:50%;">
+<p><span class="block en">Data Analysis Steps</span> <span
+class="block sk">Kroky dátovej analýzy</span></p>
+<ol>
+<li id="section">
+<span class="en"><strong>Asking a question.</strong></span> <span
+class="sk"><strong>Položiť si otázku.</strong></span>
+</li>
+<li id="section">
+<span class="en">Data acquisition.</span> <span class="sk">Získavanie
+dát.</span>
+</li>
+<li id="section">
+<span class="en">Data cleaning, preprocessing.</span> <span
+class="sk">Čistenie dát, predspracovanie.</span>
+</li>
+<li id="section">
+<span class="en">Exploratory data analysis.</span> <span
+class="sk">Exploratívna analýza dát.</span>
+</li>
+<li id="section">
+<span class="en">Modeling.</span> <span class="sk">Modelovanie.</span>
+</li>
+<li id="section">
+<span class="en">Verification.</span> <span
+class="sk">Verifikácia.</span>
+</li>
+<li id="section">
+<span class="en">Interpretation.</span> <span
+class="sk">Interpretácia.</span>
+</li>
+<li id="section">
+<span class="en">Presentation, deployment.</span> <span
+class="sk">Prezentácia, nasadenie.</span>
+</li>
+</ol>
+</div><div class="column spread05" style="width:50%;">
+<div class="huge centering space-before05 space-after1">
+<p>???</p>
+</div>
+<p><span class="en">Data analysis starts with a question:</span> <span
+class="sk">Dátová analýza začína vždy otázkou:</span></p>
+<ul>
+<li id="section" class="space-before05">
+<span class="en">What is the structure of our past year’s
+revenue?</span> <span class="sk">Aká je štruktúra našich výnosov za
+posledný rok?</span>
+</li>
+<li id="section">
+<span class="en">Can we predict demand for X over time?</span> <span
+class="sk">Vieme predikovať dopyt po X v čase?</span>
+</li>
+<li id="section">
+<span class="en">What is the relationship between X and Y?</span> <span
+class="sk">Aký je vzťah medzi X a Y?</span>
+</li>
+<li id="section">
+<span class="en">What will the outcome be if X?</span> <span
+class="sk">Aký bude výsledok ak X?</span>
+</li>
+<li id="section">
+<span class="en">What steps should I take to improve Y?</span> <span
+class="sk">Aké kroky by sme mali prijať, aby sa zlepšilo Y?</span>
+</li>
+<li id="section">
+…
+</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section id="data-acquisition-získavanie-dát"
+class="title-slide slide level2">
+<h2><span class="en">Data Acquisition</span> <span class="sk">Získavanie
+dát</span></h2>
+<p><span class="subtitle"><span><span class="en">Data Analysis: The
+Process</span> <span class="sk">Analýza dát:
+proces</span></span></span></p>
+<div class="columns">
+<div class="column spread05 space-before1" style="width:50%;">
+<p><span class="block en">Data Analysis Steps</span> <span
+class="block sk">Kroky dátovej analýzy</span></p>
+<ol>
+<li id="section">
+<span class="en">Asking a question.</span> <span class="sk">Položiť si
+otázku.</span>
+</li>
+<li id="section">
+<span class="en"><strong>Data acquisition.</strong></span> <span
+class="sk"><strong>Získavanie dát.</strong></span>
+</li>
+<li id="section">
+<span class="en">Data cleaning, preprocessing.</span> <span
+class="sk">Čistenie dát, predspracovanie.</span>
+</li>
+<li id="section">
+<span class="en">Exploratory data analysis.</span> <span
+class="sk">Exploratívna analýza dát.</span>
+</li>
+<li id="section">
+<span class="en">Modeling.</span> <span class="sk">Modelovanie.</span>
+</li>
+<li id="section">
+<span class="en">Verification.</span> <span
+class="sk">Verifikácia.</span>
+</li>
+<li id="section">
+<span class="en">Interpretation.</span> <span
+class="sk">Interpretácia.</span>
+</li>
+<li id="section">
+<span class="en">Presentation, deployment.</span> <span
+class="sk">Prezentácia, nasadenie.</span>
+</li>
+</ol>
+</div><div class="column" style="width:50%;">
+<figure>
+<img data-src="images/data/VIA.jpg" class="negspace-before025"
+style="width:85.0%"
+alt="Data often needs to be labelled before use. Data treba pred použitím často najprv anotovať." />
+<figcaption aria-hidden="true"><span class="en">Data often needs to be
+labelled before use.</span> <span class="sk">Data treba pred použitím
+často najprv anotovať.</span></figcaption>
+</figure>
+<div class="columns negspace-before025">
+<div class="column" style="width:50%;">
+<p><img data-src="images/data/uci.png" style="width:100.0%" /></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="images/data/html.png" style="width:75.0%" /></p>
+</div>
+</div>
+<div class="space-before05">
+<ul>
+<li id="section">
+<span class="en">Collect data from <strong>sensors</strong>.</span>
+<span class="sk">Zbierať dáta zo <strong>senzorov</strong>.</span>
+</li>
+<li id="section">
+<span class="en">Download and use an <strong>existing
+dataset</strong>.</span> <span class="sk">Stiahnuť a použiť
+<strong>existujúcu množinu</strong>.</span>
+</li>
+<li id="section">
+<span class="en">Connect to an <strong>SQL/noSQL</strong>
+database.</span> <span class="sk">Pripojiť s k
+<strong>SQL/noSQL</strong> databáze.</span>
+</li>
+<li id="section">
+<span class="en">Use web <strong>scraping</strong>, a
+<strong>survey</strong>, …</span> <span class="sk">Použiť web
+<strong>scraping</strong>, <strong>anketu</strong>, …</span>
+</li>
+<li id="section" class="space-before05">
+<span class="en">Often the <strong>most expensive</strong> step.</span>
+<span class="sk">Často <strong>najdrahší</strong> krok analýzy.</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+
+<section id="data-cleaning-preprocessing-čistenie-dát-predspracovanie"
+class="title-slide slide level2">
+<h2><span class="en">Data Cleaning, Preprocessing</span> <span
+class="sk">Čistenie dát, predspracovanie</span></h2>
+<p><span class="subtitle"><span><span class="en">Data Analysis: The
+Process</span> <span class="sk">Analýza dát:
+proces</span></span></span></p>
+<div class="columns">
+<div class="column spread05 space-before1" style="width:45%;">
+<p><span class="block en">Data Analysis Steps</span> <span
+class="block sk">Kroky dátovej analýzy</span></p>
+<ol>
+<li id="section">
+<span class="en">Asking a question.</span> <span class="sk">Položiť si
+otázku.</span>
+</li>
+<li id="section">
+<span class="en">Data acquisition.</span> <span class="sk">Získavanie
+dát.</span>
+</li>
+<li id="section">
+<span class="en"><strong>Data cleaning, preprocessing.</strong></span>
+<span class="sk"><strong>Čistenie dát, predspracovanie.</strong></span>
+</li>
+<li id="section">
+<span class="en">Exploratory data analysis.</span> <span
+class="sk">Exploratívna analýza dát.</span>
+</li>
+<li id="section">
+<span class="en">Modeling.</span> <span class="sk">Modelovanie.</span>
+</li>
+<li id="section">
+<span class="en">Verification.</span> <span
+class="sk">Verifikácia.</span>
+</li>
+<li id="section">
+<span class="en">Interpretation.</span> <span
+class="sk">Interpretácia.</span>
+</li>
+<li id="section">
+<span class="en">Presentation, deployment.</span> <span
+class="sk">Prezentácia, nasadenie.</span>
+</li>
+</ol>
+</div><div class="column" style="width:55%;">
+<ul>
+<li id="section">
+<span class="en">Typically very
+<strong>labour-intensive</strong>.</span> <span class="sk">Väčšinou
+veľmi <strong>prácny</strong> krok.</span>
+</li>
+</ul>
+<div class="spread05 space-before05">
+<p><span class="en block">Cleaning</span> <span
+class="sk block">Čistenie</span></p>
+<ul>
+<li id="section">
+<span class="en"><strong>Merge</strong> data from multiple
+sources.</span> <span class="sk"><strong>Zlúčenie</strong> dát z
+viacerých zdrojov.</span>
+</li>
+<li id="section">
+<span class="en"><strong>Standardize</strong> formats and
+structure.</span> <span class="sk"><strong>Štandardizácia</strong>
+formátov a štruktúry.</span>
+</li>
+<li id="section">
+<span class="en"><strong>Check</strong> for errors and
+corruptions.</span> <span class="sk"><strong>Kontrola</strong> chýb a
+porušených dát.</span>
+</li>
+<li id="section">
+…
+</li>
+</ul>
+</div>
+<div class="spread025 space-before05">
+<p><span class="en block">Preprocessing</span> <span
+class="sk block">Predspracovanie</span></p>
+<ul>
+<li id="section">
+<span class="en"><strong>Normalizing numeric</strong> variables.</span>
+<span class="sk"><strong>Normalizácia numerických</strong>
+premenných.</span>
+</li>
+<li id="section">
+<span class="en"><strong>Encoding categorical</strong> variables.</span>
+<span class="sk"><strong>Prekódovanie kategorických</strong>
+premenných.</span>
+</li>
+<li id="section">
+<span class="en">Handling <strong>missing data</strong>.</span> <span
+class="sk">Ošetrenie <strong>chýbajúcich dát</strong>.</span>
+</li>
+<li id="section">
+<span class="en">Feature <strong>extraction</strong>.</span> <span
+class="sk"><strong>Extrakcia</strong> príznakov.</span>
+</li>
+<li id="section">
+<span class="en">Feature <strong>selection</strong>.</span> <span
+class="sk"><strong>Selekcia</strong> príznakov.</span>
+</li>
+<li id="section">
+…
+</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+
+<section id="exploratory-data-analysis-exploratívna-analýza-dát"
+class="title-slide slide level2">
+<h2><span class="en">Exploratory data analysis</span> <span
+class="sk">Exploratívna analýza dát</span></h2>
+<p><span class="subtitle"><span><span class="en">Data Analysis: The
+Process</span> <span class="sk">Analýza dát:
+proces</span></span></span></p>
+<div class="columns">
+<div class="column spread05 space-before1" style="width:50%;">
+<p><span class="block en">Data Analysis Steps</span> <span
+class="block sk">Kroky dátovej analýzy</span></p>
+<ol>
+<li id="section">
+<span class="en">Asking a question.</span> <span class="sk">Položiť si
+otázku.</span>
+</li>
+<li id="section">
+<span class="en">Data acquisition.</span> <span class="sk">Získavanie
+dát.</span>
+</li>
+<li id="section">
+<span class="en">Data cleaning, preprocessing.</span> <span
+class="sk">Čistenie dát, predspracovanie.</span>
+</li>
+<li id="section">
+<span class="en"><strong>Exploratory data analysis.</strong></span>
+<span class="sk"><strong>Exploratívna analýza dát.</strong></span>
+</li>
+<li id="section">
+<span class="en">Modeling.</span> <span class="sk">Modelovanie.</span>
+</li>
+<li id="section">
+<span class="en">Verification.</span> <span
+class="sk">Verifikácia.</span>
+</li>
+<li id="section">
+<span class="en">Interpretation.</span> <span
+class="sk">Interpretácia.</span>
+</li>
+<li id="section">
+<span class="en">Presentation, deployment.</span> <span
+class="sk">Prezentácia, nasadenie.</span>
+</li>
+</ol>
+</div><div class="column spread15 space-before" style="width:50%;">
+<ul>
+<li id="section">
+<span class="en">Helps the analyst to acquaint themselves with the
+data.</span> <span class="sk">Pomôže analytikovi oboznámiť sa s dátovou
+množinou.</span>
+<ul>
+<li id="section">
+<span class="en">Exploring the <strong>variables</strong> and their
+<strong>distributions</strong>.</span> <span class="sk">Prvotné
+preskúmanie <strong>premenných</strong> a ich
+<strong>rozdelení</strong>.</span>
+</li>
+<li id="section">
+<span class="en"><strong>Visualization</strong>, search for
+<strong>relationships</strong>, regularities, etc.</span> <span
+class="sk"><strong>Vizualizácia</strong>, hľadanie
+<strong>vzťahov</strong>, zákonitostí, a pod.</span>
+</li>
+</ul>
+</li>
+<li id="section" class="space-before">
+<span class="en">EDA is a <strong>crucial step</strong> and should never
+be skipped.</span> <span class="sk">EDA je <strong>kľúčová</strong> a
+nikdy by sa nemala preskočiť.</span>
+<ul>
+<li id="section">
+<span class="en">One should always go through the data properly
+first.</span> <span class="sk">Vždy si treba najprv dôkladne prezrieť
+dáta.</span>
+</li>
+<li id="section">
+<span class="en">Even with the best model: <strong>garbage in = garbage
+out</strong>.</span> <span class="sk">Aj pri najlepšom modeli:
+<strong>garbage in = garbage out</strong>.</span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section
+id="example-unintentional-data-leakage-príklad-nežiaduce-presakovanie-dát"
+class="title-slide slide level2">
+<h2><span class="en">Example: Unintentional Data Leakage</span> <span
+class="sk">Príklad: nežiaduce presakovanie dát</span></h2>
+<p><span class="subtitle"><span><span class="en">Data Analysis: The
+Process</span> <span class="sk">Analýza dát:
+proces</span></span></span></p>
+<ul>
+<li id="section">
+<span class="en">Consider the <a
+href="https://web.inf.ufpr.br/vri/databases/parking-lot-database/">PKLot
+dataset</a> with images of parking lots.</span> <span class="sk">Vezmime
+si dátovú množinu <a
+href="https://web.inf.ufpr.br/vri/databases/parking-lot-database/">PKLot</a>
+s obrázkami parkovísk.</span>
+</li>
+<li id="section">
+<span class="en">Images collected at regular intervals.</span> <span
+class="sk">Obrázky robené v pravidelných intervaloch.</span>
+</li>
+<li id="section">
+<span class="en">A random train/test split will cause <strong>data
+leakage</strong>.</span> <span class="sk">Náhodné rozdelenie na
+tréningové/testovacie dáta spôsobí <strong>presakovanie</strong>.</span>
+</li>
+<li id="section">
+<span class="en">Some subsequent images are <strong>virtually
+identical</strong>:</span> <span class="sk">Niektoré po sebe nasledujúce
+obrázky sú <strong>prakticky identické</strong>:</span>
+</li>
+</ul>
+<div data-only="1">
+<figure>
+<img data-src="images/pklot/2013-02-23_06_05_00.jpg" style="width:80.0%"
+alt="2013-02-23_06_05_00.jpg" />
+<figcaption
+aria-hidden="true">2013-02-23_06_<strong>05</strong>_00.jpg</figcaption>
+</figure>
+</div>
+<div data-only="2">
+<figure>
+<img data-src="images/pklot/2013-02-23_06_10_00.jpg" style="width:80.0%"
+alt="2013-02-23_06_10_00.jpg" />
+<figcaption
+aria-hidden="true">2013-02-23_06_<strong>10</strong>_00.jpg</figcaption>
+</figure>
+</div>
+<div data-only="3">
+<figure>
+<img data-src="images/pklot/2013-02-23_06_15_00.jpg" style="width:80.0%"
+alt="2013-02-23_06_15_00.jpg" />
+<figcaption
+aria-hidden="true">2013-02-23_06_<strong>15</strong>_00.jpg</figcaption>
+</figure>
+</div>
+<div class="centering large" data-only="4-" style="margin-top: 4em">
+<p><span class="en">Solution: explore the data first and keep days
+together when splitting.</span> <span class="sk">Riešenie: najprv
+prezrieť dáta; ten istý deň nedeliť na dve časti.</span></p>
+</div>
+</section>
+
+<section id="modeling-modelovanie" class="title-slide slide level2">
+<h2><span class="en">Modeling</span> <span
+class="sk">Modelovanie</span></h2>
+<p><span class="subtitle"><span><span class="en">Data Analysis: The
+Process</span> <span class="sk">Analýza dát:
+proces</span></span></span></p>
+<div class="columns">
+<div class="column spread05 space-before1" style="width:50%;">
+<p><span class="block en">Data Analysis Steps</span> <span
+class="block sk">Kroky dátovej analýzy</span></p>
+<ol>
+<li id="section">
+<span class="en">Asking a question.</span> <span class="sk">Položiť si
+otázku.</span>
+</li>
+<li id="section">
+<span class="en">Data acquisition.</span> <span class="sk">Získavanie
+dát.</span>
+</li>
+<li id="section">
+<span class="en">Data cleaning, preprocessing.</span> <span
+class="sk">Čistenie dát, predspracovanie.</span>
+</li>
+<li id="section">
+<span class="en">Exploratory data analysis.</span> <span
+class="sk">Exploratívna analýza dát.</span>
+</li>
+<li id="section">
+<span class="en"><strong>Modeling.</strong></span> <span
+class="sk"><strong>Modelovanie.</strong></span>
+</li>
+<li id="section">
+<span class="en">Verification.</span> <span
+class="sk">Verifikácia.</span>
+</li>
+<li id="section">
+<span class="en">Interpretation.</span> <span
+class="sk">Interpretácia.</span>
+</li>
+<li id="section">
+<span class="en">Presentation, deployment.</span> <span
+class="sk">Prezentácia, nasadenie.</span>
+</li>
+</ol>
+</div><div class="column" style="width:50%;">
+<ul>
+<li id="section">
+<span class="en">Using the data to fit models, predict outcomes, draw
+insights, etc.</span> <span class="sk">Z dát sa učia modely, predikujeme
+výstupy, zistia sa zákonitosti, …</span>
+</li>
+<li id="section">
+<span class="en">This is where we are going to spend most of our
+course.</span> <span class="sk">Tomuto sa budeme venovať v rámci väčšiny
+nášho predmetu.</span>
+</li>
+<li id="section">
+<span class="en"><strong>Supervised learning:</strong></span> <span
+class="sk"><strong>Kontrolované učenie:</strong></span>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li id="section">
+<span class="en"><span class="math inline">\(k\)</span> nearest
+neighbours;</span> <span class="sk"><span
+class="math inline">\(k\)</span> najbližších susedov;</span>
+</li>
+<li id="section">
+<span class="en">The naïve Bayes classifier;</span> <span
+class="sk">Naivný bayesovský klasifikátor;</span>
+</li>
+<li id="section">
+<span class="en">Decision trees;</span> <span class="sk">Rozhod.
+stromy;</span>
+</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<ul>
+<li id="section">
+<span class="en">Artificial neural networks;</span> <span
+class="sk">Umelé neurónové siete;</span>
+</li>
+<li id="section">
+<span class="en">Gaussian process regression;</span> <span
+class="sk">Regresia gaussovsk. proc.;</span>
+</li>
+<li id="section">
+…
+</li>
+</ul>
+</div>
+</div>
+</li>
+<li id="section">
+<span class="en"><strong>Unsupervised learning:</strong></span> <span
+class="sk"><strong>Nekontrolované učenie:</strong></span>
+<ul>
+<li id="section">
+<span class="en">Artificial neural networks;</span> <span
+class="sk">Umelé neurónové siete;</span>
+</li>
+<li id="section">
+<span class="en"><span class="math inline">\(k\)</span>-means;</span>
+<span class="sk"><span class="math inline">\(k\)</span>-means;</span>
+</li>
+<li id="section">
+<span class="en">Hierarchical clustering;</span> <span
+class="sk">Hierarchické zhlukovanie;</span>
+</li>
+<li id="section">
+<span class="en">DBSCAN;</span> <span class="sk">DBSCAN;</span>
+</li>
+<li id="section">
+<span class="en">Principal component analysis (PCA);</span> <span
+class="sk">Analýza hlavných komponentov (PCA);</span>
+</li>
+<li id="section">
+<span class="en">UMAP;</span> <span class="sk">UMAP;</span>
+</li>
+<li id="section">
+…
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section id="verification-verifikácia" class="title-slide slide level2">
+<h2><span class="en">Verification</span> <span
+class="sk">Verifikácia</span></h2>
+<p><span class="subtitle"><span><span class="en">Data Analysis: The
+Process</span> <span class="sk">Analýza dát:
+proces</span></span></span></p>
+<div class="columns">
+<div class="column spread05 space-before1" style="width:45%;">
+<p><span class="block en">Data Analysis Steps</span> <span
+class="block sk">Kroky dátovej analýzy</span></p>
+<ol>
+<li id="section">
+<span class="en">Asking a question.</span> <span class="sk">Položiť si
+otázku.</span>
+</li>
+<li id="section">
+<span class="en">Data acquisition.</span> <span class="sk">Získavanie
+dát.</span>
+</li>
+<li id="section">
+<span class="en">Data cleaning, preprocessing.</span> <span
+class="sk">Čistenie dát, predspracovanie.</span>
+</li>
+<li id="section">
+<span class="en">Exploratory data analysis.</span> <span
+class="sk">Exploratívna analýza dát.</span>
+</li>
+<li id="section">
+<span class="en">Modeling.</span> <span class="sk">Modelovanie.</span>
+</li>
+<li id="section">
+<span class="en"><strong>Verification.</strong></span> <span
+class="sk"><strong>Verifikácia.</strong></span>
+</li>
+<li id="section">
+<span class="en">Interpretation.</span> <span
+class="sk">Interpretácia.</span>
+</li>
+<li id="section">
+<span class="en">Presentation, deployment.</span> <span
+class="sk">Prezentácia, nasadenie.</span>
+</li>
+</ol>
+</div><div class="column spread1" style="width:55%;">
+<ul>
+<li id="section">
+<span class="en">Verifying the outputs of the previous stages.</span>
+<span class="sk">Verifikácia výstupov z predošlých fáz.</span>
+</li>
+<li id="section">
+<span class="en">Depends on the kind of modeling done.</span> <span
+class="sk">Záleží na použitom type modelovania.</span>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en">E.g. after supervised learning:</span> <span
+class="sk">Napr. po kontrolovanom učení:</span>
+<ul>
+<li id="section">
+<span class="en">Computing the accuracy of a trained classifier.</span>
+<span class="sk">Výpočet správnosti natrénovaného klasifikátora.</span>
+</li>
+<li id="section">
+<span class="en">Computing the mean squared error of a regressor.</span>
+<span class="sk">Výpočet strednej kvadratickej chyby regresora.</span>
+</li>
+<li id="section">
+<span class="en">Verifying generalization using a testing
+dataset.</span> <span class="sk">Verifikácia zovšeobecnenia na
+testovacej množine.</span>
+</li>
+<li id="section">
+<span class="en">Has the model overfit / underfit / does it work
+properly?</span> <span class="sk">Je model preučený / podučený / funguje
+správne?</span>
+</li>
+</ul>
+</li>
+<li id="section" data-onslide="3-">
+<span class="en">After unsupervised learning:</span> <span class="sk">Po
+nekontrolovanom učení:</span>
+<ul>
+<li id="section">
+<span class="en">E.g. clustering: verifying the clusters’
+properties.</span> <span class="sk">Napr. zhlukovanie: verifikácia
+vlastností zhlukov.</span>
+<ul>
+<li id="section">
+<span class="en">Number, sizes, cohesion, …</span> <span
+class="sk">Počet, veľkosť, kohéznosť, …</span>
+</li>
+</ul>
+</li>
+<li id="section">
+<span class="en">Generative modeling:</span> <span
+class="sk">Generatívne modelovanie:</span>
+<ul>
+<li id="section">
+<span class="en">Does the generated data resemble the original
+data?</span> <span class="sk">Pripomínajú generované dáta tie
+pôvodné?</span>
+</li>
+</ul>
+</li>
+<li id="section">
+…
+</li>
+</ul>
+</li>
+<li id="section" data-onslide="3-">
+…
+</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section id="interpretation-interpretácia"
+class="title-slide slide level2">
+<h2><span class="en">Interpretation</span> <span
+class="sk">Interpretácia</span></h2>
+<p><span class="subtitle"><span><span class="en">Data Analysis: The
+Process</span> <span class="sk">Analýza dát:
+proces</span></span></span></p>
+<div class="columns">
+<div class="column spread05 space-before1" style="width:45%;">
+<p><span class="block en">Data Analysis Steps</span> <span
+class="block sk">Kroky dátovej analýzy</span></p>
+<ol>
+<li id="section">
+<span class="en">Asking a question.</span> <span class="sk">Položiť si
+otázku.</span>
+</li>
+<li id="section">
+<span class="en">Data acquisition.</span> <span class="sk">Získavanie
+dát.</span>
+</li>
+<li id="section">
+<span class="en">Data cleaning, preprocessing.</span> <span
+class="sk">Čistenie dát, predspracovanie.</span>
+</li>
+<li id="section">
+<span class="en">Exploratory data analysis.</span> <span
+class="sk">Exploratívna analýza dát.</span>
+</li>
+<li id="section">
+<span class="en">Modeling.</span> <span class="sk">Modelovanie.</span>
+</li>
+<li id="section">
+<span class="en">Verification.</span> <span
+class="sk">Verifikácia.</span>
+</li>
+<li id="section">
+<span class="en"><strong>Interpretation.</strong></span> <span
+class="sk"><strong>Interpretácia.</strong></span>
+</li>
+<li id="section">
+<span class="en">Presentation, deployment.</span> <span
+class="sk">Prezentácia, nasadenie.</span>
+</li>
+</ol>
+</div><div class="column spread05" style="width:55%;">
+<ul>
+<li id="section">
+<span class="en">Results of a data analysis need to be interpreted,
+conclusions drawn.</span> <span class="sk">Výsledky dátovej analýzy
+treba interpretovať a vyvodiť závery.</span>
+<div data-only="1">
+<ul>
+<li id="section">
+<span class="en">Domain-specific knowledge and understanding is usually
+necessary.</span> <span class="sk">Na to je väčšinou potrebné odborne
+rozumieť príslušnej doméne.</span>
+</li>
+<li id="section">
+<span class="en">Verification through other tests/experiments may be
+required.</span> <span class="sk">Môže sa vyžadovať verifikácia ďalšími
+testami/experimentmi.</span>
+</li>
+</ul>
+</div>
+</li>
+<li id="section" data-only="2-">
+<span class="en">Beware: <strong>Correlation does not imply
+causation</strong><!--
+--><span data-only="2-5">, e.g. (<span class="citation"
+data-cites="wikiCorrelationCausation">[1]</span>):</span><!--
+--><span data-only="6-">.</span></span> <span class="sk">Pozor:
+<strong>Korelácia neimplikuje kauzalitu</strong><!--
+--><span data-only="2-5">, napr. (<span class="citation"
+data-cites="wikiCorrelationCausation">[1]</span>):</span><!--
+--><span data-only="6-">.</span></span>
+<div data-only="2-5">
+<ul>
+<li id="section" data-onslide="2-">
+<span class="en"><strong>Reverse causation:</strong> The movement of
+tree branches is proportional to the amount of wind. Therefore: Wind is
+caused by tree branches.</span> <span class="sk"><strong>Reverzná
+kauzalita:</strong> Čím viac fúka vietor, tým viac sa hýbu koruny
+stromov. Teda: Vietor vzniká kvôli pohybu stromov.</span>
+</li>
+<li id="section" data-onslide="3-">
+<span class="en"><strong>Common cause:</strong> Sleeping with shoes on
+correlates with waking up with a headache. Therefore: Sleeping with
+shoes on causes headache.</span> <span class="sk"><strong>Spoločná
+príčina:</strong> Spánok v topánkach koreluje s bolesťou hlavy po
+prebudení. Teda: Spánok v topánkach spôsobuje bolesť hlavy.</span>
+</li>
+<li id="section" data-onslide="4-">
+<span class="en"><strong>Bidirectional causation:</strong> Predator
+numbers affect prey numbers and vice versa.</span> <span
+class="sk"><strong>Obojsmerná kauzalita:</strong> Veľkosť populácie
+dravcov ovplyvňuje veľkosť populácie koristi a naopak.</span>
+</li>
+<li id="section" data-onslide="5-">
+<span class="en"><strong>Coincidental correlation:</strong> The observed
+correlation is a coincidental property of the dataset. In general, there
+is no correlation. Solution: more data.</span> <span
+class="sk"><strong>Náhodná korelácia:</strong> Pozorovaná korelácia je
+len náhodnou vlastnosťou dátovej množiny. Vo všeobecnosti neexistuje.
+Riešenie: snažiť sa získať viac dát.</span>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<div class="space-before15 spread1" data-only="6-">
+<ul>
+<li id="section" data-onslide="6-">
+<span class="en"><strong>Question:</strong> There is a strong
+correlation between shoe size and literacy. Why?</span> <span
+class="sk"><strong>Otázka:</strong> Existuje veľmi silná závislosť medzi
+veľkosťou topánok a gramotnosťou. Prečo?</span>
+</li>
+<li id="section" data-onslide="7-">
+<span class="en"><strong>Answer:</strong> Small kids have little feet
+and they cannot read and write.</span> <span
+class="sk"><strong>Odpoveď:</strong> Lebo malé detičky s miniatúrnymi
+topánočkami nevedia čítať a písať.</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+
+<section
+id="interpretations-be-careful-about-your-data-interpretácie-dajte-si-pozor-na-dáta"
+class="title-slide slide level2">
+<h2><span class="en">Interpretations: Be Careful about Your Data</span>
+<span class="sk">Interpretácie: Dajte si pozor na dáta</span></h2>
+<p><span class="subtitle"><span><span class="en">Data Analysis: The
+Process</span> <span class="sk">Analýza dát:
+proces</span></span></span></p>
+<ul>
+<li id="section">
+<span class="en">A model can only be expected to work well with data of
+the same kind that it was trained with.</span> <span class="sk">Ak model
+aplikujeme na iný typ dát než na akých bol trénovaný, nesmieme očakávať,
+že bude správne fungovať.</span>
+</li>
+<li id="section">
+<span class="en">The data and its quality is of paramount
+importance!</span> <span class="sk">Dáta a ich kvalita majú obrovský
+význam!</span>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en">This is true of cases other than machine
+learning</span> <span class="sk">Platí to aj pre iné prípady než
+strojové učenie</span> <span class="citation"
+data-cites="jordanDownSyndrome2018">[2]</span>:
+<ul>
+<li id="section">
+<span class="en">A case from Michael Jordan of UC Berkeley;</span> <span
+class="sk">Prípad od Michaela Jordana z UC Berkeley;</span>
+</li>
+<li id="section">
+<span class="en">After getting a new higher-resolution machine doctors
+started to interpret white noise as Down syndrome markers.</span> <span
+class="sk">Po nákupe prístroja s vyšším rozlíšením začali lekári biely
+šum interpretovať ako markery Downovho syndrómu.</span>
+</li>
+</ul>
+</li>
+</ul>
+<figure>
+<img data-src="images/eval/ultrasound.png" class="space-before05"
+style="width:70.0%" alt="steemit.com" />
+<figcaption aria-hidden="true"><a
+href="https://steemit.com/science/@niubishini111/medium-changwen-reflects-on-artificial-intelligence-starting-with-a-life-and-death-story">steemit.com</a></figcaption>
+</figure>
+</section>
+
+<section id="presentation-deployment-prezentácia-nasadenie"
+class="title-slide slide level2">
+<h2><span class="en">Presentation, Deployment</span> <span
+class="sk">Prezentácia, nasadenie</span></h2>
+<p><span class="subtitle"><span><span class="en">Data Analysis: The
+Process</span> <span class="sk">Analýza dát:
+proces</span></span></span></p>
+<div class="columns">
+<div class="column spread05 space-before1" style="width:45%;">
+<p><span class="block en">Data Analysis Steps</span> <span
+class="block sk">Kroky dátovej analýzy</span></p>
+<ol>
+<li id="section">
+<span class="en">Asking a question.</span> <span class="sk">Položiť si
+otázku.</span>
+</li>
+<li id="section">
+<span class="en">Data acquisition.</span> <span class="sk">Získavanie
+dát.</span>
+</li>
+<li id="section">
+<span class="en">Data cleaning, preprocessing.</span> <span
+class="sk">Čistenie dát, predspracovanie.</span>
+</li>
+<li id="section">
+<span class="en">Exploratory data analysis.</span> <span
+class="sk">Exploratívna analýza dát.</span>
+</li>
+<li id="section">
+<span class="en">Modeling.</span> <span class="sk">Modelovanie.</span>
+</li>
+<li id="section">
+<span class="en">Verification.</span> <span
+class="sk">Verifikácia.</span>
+</li>
+<li id="section">
+<span class="en">Interpretation.</span> <span
+class="sk">Interpretácia.</span>
+</li>
+<li id="section">
+<span class="en"><strong>Presentation, deployment.</strong></span> <span
+class="sk"><strong>Prezentácia, nasadenie.</strong></span>
+</li>
+</ol>
+</div><div class="column" style="width:55%;">
+<p><span class="en block">Presentation</span> <span
+class="sk block">Prezentácia</span></p>
+<ul>
+<li id="section">
+<span class="en">Presenting the resulting insights/outputs.</span> <span
+class="sk">Prezentácia výsledných poznatkov/výstupov.</span>
+<ul>
+<li id="section">
+<span class="en">Visualizations, written reports, a website, …</span>
+<span class="sk">Vizualizácie, písomná správa, web, …</span>
+</li>
+</ul>
+</li>
+</ul>
+<p><span class="en block">Deployment</span> <span
+class="sk block">Nasadenie</span></p>
+<ul>
+<li id="section">
+<span class="en">If the analysis results in applicable models, they need
+to be deployed.</span> <span class="sk">Ak sú výsledkom analýzy
+aplikovateľné modely, nasleduje ich nasadenie.</span>
+<ul>
+<li id="section">
+<span class="en">Locally, on embedded devices, in the cloud, …</span>
+<span class="sk">Lokálne, v cloud-e, embedované zariadenia, …</span>
+</li>
+</ul>
+</li>
+</ul>
+<figure>
+<img data-src="images/data/ext_report.png" class="space-before05"
+style="width:50.0%" alt="wikimedia.org" />
+<figcaption aria-hidden="true"><a
+href="https://commons.m.wikimedia.org/wiki/File:Report.png"
+class="small">wikimedia.org</a></figcaption>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section>
+<section id="exploratory-data-analysis-exploratívna-analýza-dát-1"
+class="title-slide slide level1 empty">
+<h1 class="empty"><span class="en">Exploratory Data Analysis</span>
+<span class="sk">Exploratívna analýza dát</span></h1>
+<div class="negspace-before1">
+<ul>
+<li id="section">
+<span class="en">We always need to get some insight into what our data
+looks like first;</span> <span class="sk"></span>
+<div class="columns space-before05">
+<div class="column" style="width:50%;">
+<ul>
+<li id="section">
+<span class="en">Distributions of individual columns;</span> <span
+class="sk"></span>
+</li>
+<li id="section">
+<span class="en">Their interactions;</span> <span class="sk"></span>
+</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<ul>
+<li id="section">
+<span class="en">Any problems with the dataset;</span> <span
+class="sk"></span>
+</li>
+<li id="section">
+…
+</li>
+</ul>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<div class="columns space-before15">
+<div class="column" style="width:55%;">
+<p><img data-src="images/data/report/report.png"
+style="width:80.0%" /></p>
+</div><div class="column" style="width:45%;">
+<p><img data-src="images/data/plots/corr.svg" style="width:70.0%" /></p>
+</div>
+</div>
+</section>
+<section
+id="basic-stats-for-each-column-základné-štatistiky-pre-každý-stĺpec"
+class="title-slide slide level2">
+<h2><span class="en">Basic Stats for Each Column</span> <span
+class="sk">Základné štatistiky pre každý stĺpec</span></h2>
+<p><span class="subtitle"><span><span class="en">Exploratory Data
+Analysis</span> <span class="sk">Exploratívna analýza
+dát</span></span></span></p>
+<ul>
+<li id="section">
+<span class="en">Usually we first examine the basic stats of individual
+columns;</span> <span class="sk"></span>
+</li>
+</ul>
+<div class="columns space-before1">
+<div class="column" style="width:55%;">
+<ul>
+<li id="section">
+<span class="en">For <strong>numeric variables</strong>:</span> <span
+class="sk"></span>
+<ul>
+<li id="section">
+<span class="en">Center: mean, median, …</span> <span class="sk"></span>
+</li>
+<li id="section">
+<span class="en">Spread: standard deviation, quartiles, …</span> <span
+class="sk"></span>
+</li>
+<li id="section">
+…
+</li>
+</ul>
+</li>
+</ul>
+<p><span class="en">E.g. using <code>df.describe()</code> in
+Python:</span> <span class="sk">Napr. pomocou <code>df.describe</code> v
+Python-e:</span></p>
+<div style="font-size: 45%">
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+PassengerId
+</th>
+<th>
+Survived
+</th>
+<th>
+Pclass
+</th>
+<th>
+Age
+</th>
+<th>
+SibSp
+</th>
+<th>
+Parch
+</th>
+<th>
+Fare
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+count
+</th>
+<td>
+891.000000
+</td>
+<td>
+891.000000
+</td>
+<td>
+891.000000
+</td>
+<td>
+714.000000
+</td>
+<td>
+891.000000
+</td>
+<td>
+891.000000
+</td>
+<td>
+891.000000
+</td>
+</tr>
+<tr>
+<th>
+mean
+</th>
+<td>
+446.000000
+</td>
+<td>
+0.383838
+</td>
+<td>
+2.308642
+</td>
+<td>
+29.699118
+</td>
+<td>
+0.523008
+</td>
+<td>
+0.381594
+</td>
+<td>
+32.204208
+</td>
+</tr>
+<tr>
+<th>
+std
+</th>
+<td>
+257.353842
+</td>
+<td>
+0.486592
+</td>
+<td>
+0.836071
+</td>
+<td>
+14.526497
+</td>
+<td>
+1.102743
+</td>
+<td>
+0.806057
+</td>
+<td>
+49.693429
+</td>
+</tr>
+<tr>
+<th>
+min
+</th>
+<td>
+1.000000
+</td>
+<td>
+0.000000
+</td>
+<td>
+1.000000
+</td>
+<td>
+0.420000
+</td>
+<td>
+0.000000
+</td>
+<td>
+0.000000
+</td>
+<td>
+0.000000
+</td>
+</tr>
+<tr>
+<th>
+25%
+</th>
+<td>
+223.500000
+</td>
+<td>
+0.000000
+</td>
+<td>
+2.000000
+</td>
+<td>
+20.125000
+</td>
+<td>
+0.000000
+</td>
+<td>
+0.000000
+</td>
+<td>
+7.910400
+</td>
+</tr>
+<tr>
+<th>
+50%
+</th>
+<td>
+446.000000
+</td>
+<td>
+0.000000
+</td>
+<td>
+3.000000
+</td>
+<td>
+28.000000
+</td>
+<td>
+0.000000
+</td>
+<td>
+0.000000
+</td>
+<td>
+14.454200
+</td>
+</tr>
+<tr>
+<th>
+75%
+</th>
+<td>
+668.500000
+</td>
+<td>
+1.000000
+</td>
+<td>
+3.000000
+</td>
+<td>
+38.000000
+</td>
+<td>
+1.000000
+</td>
+<td>
+0.000000
+</td>
+<td>
+31.000000
+</td>
+</tr>
+<tr>
+<th>
+max
+</th>
+<td>
+891.000000
+</td>
+<td>
+1.000000
+</td>
+<td>
+3.000000
+</td>
+<td>
+80.000000
+</td>
+<td>
+8.000000
+</td>
+<td>
+6.000000
+</td>
+<td>
+512.329200
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div><div class="column" style="width:2%;">
+
+</div><div class="column" data-onslide="2-" style="width:43%;">
+<ul>
+<li id="section">
+<span class="en">For <strong>categorical variables</strong>:</span>
+<span class="sk"></span>
+<ul>
+<li id="section">
+<span class="en">Number of different values;</span> <span
+class="sk"></span>
+</li>
+<li id="section">
+<span class="en">Their frequencies;</span> <span class="sk"></span>
+</li>
+<li id="section">
+…
+</li>
+</ul>
+</li>
+</ul>
+<pre><code>count     889
+unique      3
+top         S
+freq      644
+Name: Embarked, dtype: object</code></pre>
+<ul>
+<li id="section" class="space-before1" data-onslide="3-">
+<span class="en"><strong>Unstructured data:</strong></span> <span
+class="sk"></span>
+<ul>
+<li id="section">
+<span class="en">E.g. strings, images, audio, etc.</span> <span
+class="sk"></span>
+</li>
+<li id="section">
+<span class="en">Preprocessing typically needs to be done before we can
+get much out of it;</span> <span class="sk"></span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="space-before05" data-onslide="4-">
+<ul>
+<li id="section">
+<span class="en">We also check for <strong>missing data</strong> in each
+column:</span> <span class="sk"></span>
+<pre><code>Survived         0
+Age            177
+...</code></pre>
+</li>
+</ul>
+</div>
+</section>
+
+<section id="automatic-reports-1-automatické-protokoly-1"
+class="title-slide slide level2">
+<h2><span class="en">Automatic Reports (1)</span> <span
+class="sk">Automatické protokoly (1)</span></h2>
+<p><span class="subtitle"><span><span class="en">Exploratory Data
+Analysis</span> <span class="sk">Exploratívna analýza
+dát</span></span></span></p>
+<div class="columns">
+<div class="column" style="width:70%;">
+<iframe width="120%" height="560" src="images/data/report/report.html" title="A Sample SweetViz Report">
+</iframe>
+<div class="centering tiny negspace-before05">
+<p><a target="_blank" href="images/data/report/report.html">A Sample
+SweetViz Report</a></p>
+</div>
+</div><div class="column" style="width:30%;">
+<ul>
+<li id="section">
+<span class="en">There are tools (e.g. <code>sweetviz</code>) that make
+this task easier by generating automatic reports.</span> <span
+class="sk">Existujú nástroje (napr. <code>sweetviz</code>), ktoré to
+uľahčujú generovaním automatických protokolov.</span>
+<div class="spread05 space-before05">
+<ul>
+<li id="section">
+<span class="en">Summary dataframe statistics;</span> <span
+class="sk">sumárne štatistiky dátového rámca;</span>
+</li>
+<li id="section">
+<span class="en">Associations;</span> <span class="sk">asociácie;</span>
+</li>
+<li id="section">
+<span class="en">Individual attributes’ summary statistics;</span> <span
+class="sk">Sumárne štatistiky jednotlivých atribútov;</span>
+</li>
+<li id="section">
+<span class="en">Missing data percentages;</span> <span
+class="sk">Percentá chýbajúcich dát;</span>
+</li>
+<li id="section">
+<span class="en">Simple plots;</span> <span class="sk">Jednoduché
+grafy;</span>
+</li>
+<li id="section">
+<span class="en">Frequent values;</span> <span class="sk">Často sa
+opakujúce hodnoty;</span>
+</li>
+<li id="section">
+…
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section id="automatic-reports-2-automatické-protokoly-2"
+class="title-slide slide level2">
+<h2><span class="en">Automatic Reports (2)</span> <span
+class="sk">Automatické protokoly (2)</span></h2>
+<p><span class="subtitle"><span><span class="en">Exploratory Data
+Analysis</span> <span class="sk">Exploratívna analýza
+dát</span></span></span></p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li id="section">
+<span class="en">Num. of rows, duplicates, columns, etc.</span> <span
+class="sk">Poč. riadkov, duplicít, stĺpcov a pod.</span>
+</li>
+</ul>
+<p><img data-src="images/data/report/sv_overview.png"
+style="width:100.0%" /></p>
+<div data-onslide="3-">
+<ul>
+<li id="section">
+<span class="en">Variable info: values, type, missing data</span> <span
+class="sk">Info: hodnoty stĺpca, typ, % chýbajúcich</span>
+</li>
+</ul>
+<p><img data-src="images/data/report/sv_var.png"
+style="width:45.0%" /></p>
+<ul>
+<li id="section">
+<span class="en">Associations:</span> <span class="sk">Asociácie:</span>
+</li>
+</ul>
+<p><img data-src="images/data/report/sv_var_assoc.png"
+style="width:35.0%" /></p>
+</div>
+</div><div class="column" style="width:50%;">
+<div data-onslide="2-">
+<ul>
+<li id="section">
+<span class="en">The associations matrix:</span> <span class="sk">Matica
+asociácií:</span>
+<ul>
+<li id="section">
+<span class="en">How strongly variables are related.</span> <span
+class="sk">Ako silno premenné súvisia.</span>
+</li>
+<li id="section">
+<span class="en">Several different kinds of interactions:</span> <span
+class="sk">Viacero rôznych typov interakcií:</span>
+<ul>
+<li id="section">
+<span class="en">num vs. num: Person’s correlation;</span> <span
+class="sk">num vs. num: Pearsonova korelácia;</span>
+</li>
+<li id="section">
+<span class="en">num vs. cat: correlation ratio;</span> <span
+class="sk">num vs. kat: korelačný pomer;</span>
+</li>
+<li id="section">
+<span class="en">cat vs. cat: uncertainty coefficient.</span> <span
+class="sk">kat vs. kat: koeficient neistoty.</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img data-src="images/data/report/sv_assoc.png"
+style="width:100.0%" /></p>
+</div>
+</div>
+</div>
+</section>
+
+<section id="automatic-reports-3-automatické-protokoly-3"
+class="title-slide slide level2">
+<h2><span class="en">Automatic Reports (3)</span> <span
+class="sk">Automatické protokoly (3)</span></h2>
+<p><span class="subtitle"><span><span class="en">Exploratory Data
+Analysis</span> <span class="sk">Exploratívna analýza
+dát</span></span></span></p>
+<div class="spread05">
+<ul>
+<li id="section">
+<span class="en">Numeric Variables</span> <span class="sk">Numerické
+premenné</span>
+<p><img data-src="images/data/report/sv_var_numeric.png"
+style="width:65.0%" /></p>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en">Categorical Variables</span> <span
+class="sk">Kategorické premenné</span>
+<p><img data-src="images/data/report/sv_var_cat.png"
+style="width:30.0%" /></p>
+</li>
+<li id="section" data-onslide="3-">
+<span class="en">Textual Variables</span> <span class="sk">Textové
+premenné</span>
+<p><img data-src="images/data/report/sv_var_string.png"
+style="width:40.0%" /></p>
+</li>
+</ul>
+</div>
+</section>
+</section>
+<section>
+<section id="distribution-plots-grafy-rozdelení"
+class="title-slide slide level1 empty">
+<h1 class="empty"><span class="en">Distribution Plots</span> <span
+class="sk">Grafy rozdelení</span></h1>
+
+</section>
+<section
+id="distributions-numeric-variables-histogram-rozdelenia-numerické-premenné-histogram"
+class="title-slide slide level2">
+<h2><span class="en">Distributions: Numeric Variables (Histogram)</span>
+<span class="sk">Rozdelenia: numerické premenné (histogram)</span></h2>
+<p><span class="subtitle"><span><span class="en">Distribution
+Plots</span> <span class="sk">Grafy rozdelení</span></span></span></p>
+<div class="columns">
+<div class="column" style="width:55%;">
+<p><img data-src="images/data/plots/hist_colgrid_nokde.svg"
+data-only="1" style="width:100.0%" /> <img
+data-src="images/data/plots/hist_colgrid.svg" data-only="2-"
+style="width:100.0%" /></p>
+</div><div class="column" style="width:45%;">
+<ul>
+<li id="section">
+<span class="en">Distributions of numeric variables can be visualized
+using <strong>histograms</strong>:</span> <span class="sk">Rozdelenie
+numerickej premennej sa dá vizualizovať
+<strong>histogramom</strong>:</span>
+<div class="space-before05 spread025">
+<ul>
+<li id="section">
+<span class="en">The <strong>continuous</strong> range is partitioned
+into <strong>discrete bins</strong>;</span> <span
+class="sk"><strong>Spojitý</strong> rozsah sa rozdelí na
+<strong>diskrétne intervaly</strong>;</span>
+</li>
+<li id="section">
+<span class="en">The <strong>count</strong> of points <strong>in each
+bin</strong> is plotted using a bar plot;</span> <span
+class="sk"><strong>Počet</strong> bodov <strong>v každom
+intervale</strong> sa zobrazí v stĺpcovom grafe;</span>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en">Often overlaid with a <strong>KDE curve</strong>
+(kernel density estimate);</span> <span class="sk">Nad grafom býva často
+<strong>KDE krivka</strong> (kernel density estimate);</span>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<div class="space-before05" data-onslide="3-">
+<ul>
+<li id="section">
+<span class="en">The <strong>number and ranges of bins</strong> are
+configurable:</span> <span class="sk">Počet (rozsah) intervalov sa dá
+nastaviť:</span>
+</li>
+</ul>
+<p><img data-src="images/data/plots/hist_5bin.svg"
+style="width:75.0%" /></p>
+</div>
+</div>
+</div>
+</section>
+
+<section
+id="distributions-categorical-variables-rozdelenia-kategorické-premenné"
+class="title-slide slide level2">
+<h2><span class="en">Distributions: Categorical Variables</span> <span
+class="sk">Rozdelenia: kategorické premenné</span></h2>
+<p><span class="subtitle"><span><span class="en">Distribution
+Plots</span> <span class="sk">Grafy rozdelení</span></span></span></p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="images/data/plots/count_colgrid.svg"
+style="width:90.0%" /></p>
+</div><div class="column spread05" style="width:50%;">
+<p><span class="en block">Bar Plot</span> <span
+class="sk block">Stĺpcový graf</span></p>
+<ul>
+<li id="section">
+<span class="en">A common choice for categorical variables;</span> <span
+class="sk">Bežná voľba pre kategorické premenné;</span>
+<div class="space-before05 spread05">
+<ul>
+<li id="section">
+<span class="en">The variable is <strong>already
+discrete</strong>;</span> <span class="sk">Premenná je <strong>už
+diskrétna</strong>;</span>
+</li>
+<li id="section">
+<span class="en">No <strong>need to partition</strong> into bins;</span>
+<span class="sk"><strong>Netreba deliť</strong> na intervaly;</span>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="columns space-before05" data-onslide="2-">
+<div class="column" style="width:50%;">
+<p><img data-src="images/data/plots/pie.svg" style="width:45.0%" /></p>
+</div><div class="column spread05" style="width:50%;">
+<p><span class="en block">Pie Chart</span> <span
+class="sk block">Koláčový graf</span></p>
+<ul>
+<li id="section">
+<span class="en">To display proportions of values;</span> <span
+class="sk">Zobrazenie podielov hodnôt;</span>
+<div class="space-before05 spread05">
+<ul>
+<li id="section">
+<span class="en">But they are more <strong>difficult to
+read</strong>;</span> <span class="sk">Ale sú <strong>ťažšie
+čitateľné</strong>;</span>
+</li>
+<li id="section">
+<span class="en">Their use is <strong>discouraged</strong>;</span> <span
+class="sk"><strong>Neodporúča sa</strong> ich používať;</span>
+</li>
+<li id="section">
+<span class="en">You can annotate with the percentages;</span> <span
+class="sk">Percentá sa dajú pridať ako popisky;</span>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section id="stacked-bar-plots-skladané-stĺpcové-grafy"
+class="title-slide slide level2">
+<h2><span class="en">Stacked Bar Plots</span> <span class="sk">Skladané
+stĺpcové grafy</span></h2>
+<p><span class="subtitle"><span><span class="en">Distribution
+Plots</span> <span class="sk">Grafy rozdelení</span></span></span></p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="images/data/plots/stacked_bar_plot_sex.svg"
+style="width:80.0%" /></p>
+</div><div class="column" style="width:50%;">
+<p><span class="block en">As an Alternative to Pie Charts</span> <span
+class="block sk">Alternatíva ku koláčovým grafom</span></p>
+<div class="spread05">
+<ul>
+<li id="section">
+<span class="en">Another alternative to pie charts – if you don’t like
+standard bar plots;</span> <span class="sk">Ďalšia alternatíva ku
+koláčovým grafom – okrem štandardných stĺpcových;</span>
+</li>
+<li id="section">
+<span class="en">You get a clear axis and scale;</span> <span
+class="sk">Získate jasnú os a stupnicu;</span>
+</li>
+<li id="section">
+<span class="en">Can still sum up to a total (100% here);</span> <span
+class="sk">Môže sa sčítať na určitú sumu (tu 100%);</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="columns space-before05" data-onslide="2-">
+<div class="column" style="width:50%;">
+<p><img data-src="images/data/plots/stacked_bar_plot_pivot.svg"
+style="width:80.0%" /></p>
+</div><div class="column negspace-before05" style="width:50%;">
+<p><span class="block en">General Use</span> <span
+class="block sk">Všeobecné využitie</span></p>
+<ul>
+<li id="section">
+<span class="en">Also useful to visualize a pivot table of any
+kind;</span> <span class="sk">Užitočné aj na vykreslenie kontingenčnej
+tabuľky ľubovoľného druhu;</span>
+</li>
+</ul>
+<div class="space-before05" style="font-size: 70%">
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+Sex
+</th>
+<th>
+female
+</th>
+<th>
+male
+</th>
+</tr>
+<tr>
+<th>
+Embarked
+</th>
+<th>
+</th>
+<th>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+C
+</th>
+<td>
+64
+</td>
+<td>
+29
+</td>
+</tr>
+<tr>
+<th>
+Q
+</th>
+<td>
+27
+</td>
+<td>
+3
+</td>
+</tr>
+<tr>
+<th>
+S
+</th>
+<td>
+140
+</td>
+<td>
+77
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+
+<section id="other-distribution-plots-ďalšie-grafy-rozdelení"
+class="title-slide slide level2">
+<h2><span class="en">Other Distribution Plots</span> <span
+class="sk">Ďalšie grafy rozdelení</span></h2>
+<p><span class="subtitle"><span><span class="en">Distribution
+Plots</span> <span class="sk">Grafy rozdelení</span></span></span></p>
+<div class="spread2" style="margin-top: 4em">
+<ul>
+<li id="section">
+<span class="en">There are many other way to plot distributions;</span>
+<span class="sk"></span>
+</li>
+<li id="section">
+<span class="en">Some of them (e.g. the boxplot) will even be discussed
+here;</span> <span class="sk"></span>
+<div class="space-before1 spread1">
+<ul>
+<li id="section">
+<span class="en">They are in the section on visualizing interactions
+between variables;</span> <span class="sk"></span>
+</li>
+<li id="section">
+<span class="en">But can also be used for single variables…</span> <span
+class="sk"></span>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</section>
+</section>
+<section>
+<section id="correlation-plots-korelačné-grafy"
+class="title-slide slide level1 empty">
+<h1 class="empty"><span class="en">Correlation Plots</span> <span
+class="sk">Korelačné grafy</span></h1>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="images/data/plots/corr.svg" style="width:70.0%" /></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="images/data/plots/assoc.svg"
+style="width:70.0%" /></p>
+</div>
+</div>
+</section>
+<section id="the-correlation-matrix-korelačná-matica"
+class="title-slide slide level2">
+<h2><span class="en">The Correlation Matrix</span> <span
+class="sk">Korelačná matica</span></h2>
+<p><span class="subtitle"><span><span class="en">Correlation
+Plots</span> <span class="sk">Korelačné grafy</span></span></span></p>
+<div class="columns">
+<div class="column vcentering" style="width:60%;">
+<p><img data-src="images/data/plots/corr_unmasked.svg" data-only="1"
+style="width:100.0%" /> <img data-src="images/data/plots/corr.svg"
+data-only="2" style="width:100.0%" /> <img
+data-src="images/data/plots/corr_pbound_masked.svg" data-only="3"
+style="width:100.0%" /></p>
+</div><div class="column spread075 vcentering" style="width:40%;">
+<ul>
+<li id="section">
+<span class="en">Displays correlations between all pairs of
+variables.</span> <span class="sk">Zobrazuje korelácie medzi pármi
+premenných.</span>
+<ul>
+<li id="section">
+<span class="en">Usually using <strong>Pearson’s correlation
+coefficient</strong>:</span> <span class="sk">Typicky pomocou
+<strong>Pearsonovho korelačného koeficientu</strong>:</span>
+<p><span class="math display">\[
+\rho_{X,Y} = \frac{\mathrm{cov}(X, Y)}{\sigma_X \sigma_Y}
+\]</span></p>
+</li>
+</ul>
+<div class="spread025 space-before05">
+<ul>
+<li id="section">
+<span class="en"><strong>Large absolute values</strong> mean strong
+relationships.</span> <span class="sk"><strong>Veľké absolútne
+hodnoty</strong> znamenajú silnú závislosť.</span>
+</li>
+<li id="section">
+<span class="en"><span
+style="color:green"><strong>Positive:</strong></span> directly
+proportional;</span> <span class="sk"><span
+style="color:green"><strong>Kladné:</strong></span> priamo
+úmerné;</span>
+</li>
+<li id="section">
+<span class="en"><span
+style="color:red"><strong>Negative:</strong></span> inversely
+proportional;</span> <span class="sk"><span
+style="color:red"><strong>Záporné:</strong></span> nepriamo
+úmerné;</span>
+</li>
+</ul>
+</div>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en">Diagonal always has <strong>1s</strong> on it;</span>
+<span class="sk">Diagonála obsahuje vždy <strong>1-ky</strong>;</span>
+<ul>
+<li id="section">
+<span class="en">It is a good idea to mask them out;</span> <span
+class="sk">Je dobrý nápad ich zamaskovať;</span>
+</li>
+</ul>
+</li>
+<li id="section" data-onslide="3-">
+<span class="en">We can also mask out entries with
+<strong>p-values</strong> above some threshold;</span> <span
+class="sk"></span>
+</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section id="the-associations-matrix-matica-asociácií"
+class="title-slide slide level2">
+<h2><span class="en">The Associations Matrix</span> <span
+class="sk">Matica asociácií</span></h2>
+<p><span class="subtitle"><span><span class="en">Correlation
+Plots</span> <span class="sk">Korelačné grafy</span></span></span></p>
+<div class="columns">
+<div class="column vcentering" style="width:60%;">
+<p><img data-src="images/data/plots/assoc.svg"
+style="width:100.0%" /></p>
+</div><div class="column spread075 vcentering" style="width:40%;">
+<ul>
+<li id="section">
+<span class="en">Conceptually similar to the correlation matrix;</span>
+<span class="sk">Konceptuálne podobná korelačnej matici;</span>
+</li>
+<li id="section">
+<span class="en">Several different kinds of interactions:</span> <span
+class="sk">Viacero rôznych typov interakcií:</span>
+<ul>
+<li id="section">
+<span class="en"><strong>num vs. num:</strong> Person’s
+correlation;</span> <span class="sk"><strong>num vs. num:</strong>
+Pearsonova korelácia;</span>
+</li>
+<li id="section">
+<span class="en"><strong>num vs. cat:</strong> correlation ratio;</span>
+<span class="sk"><strong>num vs. kat:</strong> korelačný pomer;</span>
+</li>
+<li id="section">
+<span class="en"><strong>cat vs. cat:</strong> uncertainty coefficient
+(here we use the symmetrical version).</span> <span
+class="sk"><strong>kat vs. kat:</strong> koeficient neistoty (tu
+používame symetrickú verziu).</span>
+</li>
+<li id="section" class="space-before1" data-onslide="2-">
+<span class="en"><strong>Circles:</strong> numeric vs. numeric;</span>
+<span class="sk"><strong>Kruhy:</strong> numerické vs. numerické;</span>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en"><strong>Squares:</strong> other interactions;</span>
+<span class="sk"><strong>Štvorce:</strong> ostatné interakcie;</span>
+</li>
+</ul>
+</li>
+<li id="section" data-onslide="3-">
+<span class="en"><strong>Magnitude</strong> also visualized using
+<strong>size</strong> (Hinton diagram): makes the plot more
+readable.</span> <span class="sk"><strong>Magnitúda</strong> sa
+vizualizuje aj <strong>veľkosťou</strong> (Hintonov diagram): lepšia
+čitateľnosť grafu.</span>
+</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section>
+<section id="interaction-plots-grafy-interakcií"
+class="title-slide slide level1 empty">
+<h1 class="empty"><span class="en">Interaction Plots</span> <span
+class="sk">Grafy interakcií</span></h1>
+<p><img data-src="images/data/plots/violin_ordinal.svg"
+style="width:60.0%" /></p>
+</section>
+<section
+id="interactions-numeric-vs.-numeric-interakcie-numerické-vs.-numerické"
+class="title-slide slide level2">
+<h2><span class="en">Interactions: Numeric vs. Numeric</span> <span
+class="sk">Interakcie: numerické vs. numerické</span></h2>
+<p><span class="subtitle"><span><span class="en">Interaction
+Plots</span> <span class="sk">Grafy interakcií</span></span></span></p>
+<div class="columns">
+<div class="column" style="width:47%;">
+<p><img data-src="images/data/plots/scatter.svg"
+style="width:90.0%" /></p>
+</div><div class="column spread05" style="width:53%;">
+<p><span class="en block">Scatter Plot</span> <span
+class="sk block">Bodový diagram</span></p>
+<ul>
+<li id="section">
+<span class="en">A point for each row in the dataset, one column on each
+axis.</span> <span class="sk">Bod pre každý riadok z dátovej množiny, po
+jednom stĺpci na os.</span>
+</li>
+<li id="section">
+<span class="en">Gives a relatively full idea of what the spread of the
+points is.</span> <span class="sk">Dáva relatívne úplný pohľad na to
+akým spôsobom sú body roztrúsené.</span>
+</li>
+</ul>
+</div>
+</div>
+<div class="columns" data-onslide="2-">
+<div class="column" style="width:47%;">
+<p><img data-src="images/data/plots/line.svg" data-only="2"
+style="width:100.0%" /> <img data-src="images/data/plots/line_ma.svg"
+data-only="3-" style="width:100.0%" /></p>
+</div><div class="column spread025 negspace-before05"
+style="width:53%;">
+<p><span class="en block">Line Plot</span> <span
+class="sk block">Čiarový graf</span></p>
+<ul>
+<li id="section">
+<span class="en">Points on the horizontal axis (<span
+class="math inline">\(x\)</span>):</span> <span class="sk">Body na
+horizontálnej osi (<span class="math inline">\(x\)</span>)</span>
+<ul>
+<li id="section">
+<span class="en">Need to be sorted (to be connected correctly);</span>
+<span class="sk">Musia byť zotriedené (aby sa správne spojili);</span>
+</li>
+<li id="section">
+<span class="en">1 <span class="math inline">\(y\)</span> per <span
+class="math inline">\(x\)</span>: group by <span
+class="math inline">\(x\)</span>s and average the <span
+class="math inline">\(y\)</span>s;</span> <span class="sk">1 <span
+class="math inline">\(y\)</span> pre každé <span
+class="math inline">\(x\)</span>: združiť podľa <span
+class="math inline">\(x\)</span> a priemerovať;</span>
+</li>
+</ul>
+</li>
+<li id="section">
+<span class="en">Not to lose information about variance:</span> <span
+class="sk">Aby sa nestratila informácia o rozptyle:</span>
+<ul>
+<li id="section">
+<span class="en">95% confidence intervals: the shaded area;</span> <span
+class="sk">95% intervaly spoľahlivosti: farebná plocha;</span>
+</li>
+<li id="section">
+<span class="en">True mean is in the interval with prob. 0.95;</span>
+<span class="sk">Stredná hodnota je v intervale s pravd. 0.95;</span>
+</li>
+</ul>
+</li>
+<li id="section" data-onslide="3-">
+<span class="en">Moving average to get a smoother curve;</span> <span
+class="sk">Kĺzavý priemer ak chceme hladšiu krivku;</span>
+</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section
+id="interactions-categorical-vs.-categorical-interakcie-kategorické-vs.-kategorické"
+class="title-slide slide level2">
+<h2><span class="en">Interactions: Categorical vs. Categorical</span>
+<span class="sk">Interakcie: kategorické vs. kategorické</span></h2>
+<p><span class="subtitle"><span><span class="en">Interaction
+Plots</span> <span class="sk">Grafy interakcií</span></span></span></p>
+<div class="columns">
+<div class="column" style="width:53%;">
+<p><img data-src="images/data/plots/crosstab_colgrid.svg"
+style="width:100.0%" /></p>
+</div><div class="column" style="width:2%;">
+
+</div><div class="column space-before15 spread075" style="width:45%;">
+<div class="negspace-before15">
+<p><span class="block en">Cross-Tabulation Plots</span> <span
+class="block sk">Vizualizácia krížovej tabuľky</span></p>
+<ul>
+<li id="section">
+<span class="en">We can cross-tabulate the two variables;</span> <span
+class="sk">Pre premenné sa vytvorí krížová tabuľka;</span>
+</li>
+<li id="section">
+<span class="en">This tells us how much each pair of values
+co-occurs;</span> <span class="sk">Hovorí koľko má spoločných výskytov
+každý pár hodnôt;</span>
+</li>
+<li id="section">
+<span class="en">Display the resulting matrix in a plot;</span> <span
+class="sk">Výsledná matica sa zobrazí graficky;</span>
+</li>
+</ul>
+<p><img data-src="images/data/plots/crosstab.svg" class="space-before15"
+style="width:60.0%" /></p>
+</div>
+</div>
+</div>
+</section>
+
+<section
+id="interactions-numeric-vs.-categorical-interakcie-numerické-vs.-kategorické-1"
+class="title-slide slide level2">
+<h2><span class="en">Interactions: Numeric vs. Categorical</span> <span
+class="sk">Interakcie: numerické vs. kategorické</span> (1)</h2>
+<p><span class="subtitle"><span><span class="en">Interaction
+Plots</span> <span class="sk">Grafy interakcií</span></span></span></p>
+<div class="columns space-before1">
+<div class="column vcentering" style="width:60%;">
+<p><span class="en block">Box Plot</span> <span class="sk block">Box
+plot</span></p>
+<div class="space-before05 spread05 space-after2">
+<ul>
+<li id="section">
+<span class="en">Distribution of a <strong>numeric
+variable</strong>;</span> <span class="sk">Rozdelenie numerickej
+premennej;</span>
+</li>
+<li id="section">
+<span class="en"><strong>Across</strong> different values of a
+<strong>categorical variable</strong>;</span> <span
+class="sk"><strong>Naprieč</strong> rôznymi hodnotami
+*<strong>kategorickej premennej</strong>;</span>
+</li>
+</ul>
+</div>
+<p><img data-src="images/data/plots/box.svg" style="width:80.0%" /></p>
+</div><div class="column" style="width:40%;">
+<p><span class="en block">Features of the plot:</span> <span
+class="sk block">Vlastnosti grafu:</span></p>
+<div class="spread05 space-before05">
+<ul>
+<li id="section">
+<span class="en"><strong>The box;</strong></span> <span
+class="sk"><strong>Obdĺžnik;</strong></span>
+<ul>
+<li id="section">
+<span class="en">From <strong>25th</strong> to the <strong>75th
+percentile</strong>;</span> <span class="sk">Od <strong>25.</strong> po
+<strong>75. percentil</strong>;</span>
+</li>
+<li id="section">
+<span class="en">I.e. the <strong>middle 50%</strong> of the data is in
+the box;</span> <span class="sk">T.j. <strong>prostredných 50%</strong>
+dát leží v ňom;</span>
+</li>
+</ul>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en"><strong>The line through the box;</strong></span> <span
+class="sk"><strong>Čiara naprieč obdĺžnikom;</strong></span>
+<ul>
+<li id="section">
+<span class="en">Represents the median;</span> <span
+class="sk">Predstavuje medián;</span>
+</li>
+<li id="section">
+<span class="en">I.e. 50% of the data lies below that line;</span> <span
+class="sk">T.j. 50% dát leží pod čiarou;</span>
+</li>
+</ul>
+</li>
+<li id="section" data-onslide="3-">
+<span class="en"><strong>The whiskers;</strong></span> <span
+class="sk"><strong>Úsečky</strong>;</span>
+<ul>
+<li id="section">
+<span class="en">Span the minimum and the maximum;</span> <span
+class="sk">Siahajú od minima po maximum</span>
+</li>
+</ul>
+</li>
+<li id="section" data-onslide="4-">
+<span class="en"><strong>Individual points;</strong></span> <span
+class="sk"><strong>Jednotlivé body;</strong></span>
+<ul>
+<li id="section">
+<span class="en">Represent outliers (anomalous points);</span> <span
+class="sk">Predstavujú odľahlé (anomálne) body;</span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+
+<section
+id="interactions-numeric-vs.-categorical-interakcie-numerické-vs.-kategorické-2"
+class="title-slide slide level2">
+<h2><span class="en">Interactions: Numeric vs. Categorical</span> <span
+class="sk">Interakcie: numerické vs. kategorické</span> (2)</h2>
+<p><span class="subtitle"><span><span class="en">Interaction
+Plots</span> <span class="sk">Grafy interakcií</span></span></span></p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="images/data/plots/violin.svg" class="space-after05"
+style="width:85.0%" /> <img
+data-src="images/data/plots/violin_ordinal_pclass.svg"
+class="space-after05" style="width:85.0%" /></p>
+</div><div class="column spread1 space-before075" style="width:50%;">
+<div class="negspace-before1">
+<p><span class="en block">Violin Plot</span> <span
+class="sk block">Violin plot (husličkový graf)</span></p>
+</div>
+<ul>
+<li id="section">
+<span class="en">Represents distributions more fully:</span> <span
+class="sk">Úplnejšia reprezentácia rozdelenia:</span>
+<ul>
+<li id="section">
+<span class="en">Like a <strong>rotated histogram</strong>;</span> <span
+class="sk">Ako <strong>rotovaný histogram</strong>;</span>
+</li>
+<li id="section">
+<span class="en">Especially useful with <strong>multimodal</strong>
+distributions (i.e. multiple maxima);</span> <span class="sk">Osobitne
+užitočné pri <strong>multimodálnych</strong> rozdeleniach (viacero
+maxím);</span>
+</li>
+</ul>
+</li>
+<li id="section">
+<span class="en">Interpretation:</span> <span
+class="sk">Interpretácia:</span>
+<div class="space-before05 spread05">
+<ul>
+<li id="section">
+<span class="en"><strong>Thickness:</strong> the
+<strong>frequency</strong> of the value;</span> <span
+class="sk"><strong>Hrúbka:</strong> <strong>početnosť</strong> danej
+hodnoty;</span>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en"><strong>The thick line:</strong> interquartile
+range;</span> <span class="sk"><strong>Hrubá čiara:</strong>
+medzikvartilové rozpätie;</span>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en"><strong>The white dot:</strong> the median;</span>
+<span class="sk"><strong>Biela bodka:</strong> medián;</span>
+</li>
+<li id="section" data-onslide="3-">
+<span class="en"><strong>The thin line:</strong> 95% confidence
+interval;</span> <span class="sk"></span>
+</li>
+<li id="section" data-onslide="3-">
+<span class="en"><strong>Violin itself</strong>: covers the observed
+points + some extra space;</span>
+<ul>
+<li id="section">
+<span class="en">Differs by implementation and parameters;</span> <span
+class="sk"></span>
+</li>
+<li id="section">
+<span class="en">E.g. if you set <code>cut=0</code> in
+<code>seaborn</code>, it covers just the observed data;</span> <span
+class="sk"></span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section
+id="interactions-numeric-vs.-categorical-interakcie-numerické-vs.-kategorické-2-1"
+class="title-slide slide level2">
+<h2><span class="en">Interactions: Numeric vs. Categorical</span> <span
+class="sk">Interakcie: numerické vs. kategorické</span> (2)</h2>
+<p><span class="subtitle"><span><span class="en">Interaction
+Plots</span> <span class="sk">Grafy interakcií</span></span></span></p>
+<div class="columns space-before2">
+<div class="column" style="width:55%;">
+<p><img data-src="images/data/plots/raincloud.svg"
+class="space-after05 space-before2" style="width:85.0%" /></p>
+</div><div class="column" style="width:45%;">
+<p><span class="en block">Raincloud Plot</span> <span
+class="sk block">Raincloud graf</span></p>
+<div class="space-before1 spread1">
+<ul>
+<li id="section">
+<span class="en">Every now and then people come up with a new kind of
+plot;</span> <span class="sk"></span>
+</li>
+<li id="section">
+<span class="en">The raincloud plot combines:</span> <span
+class="sk"></span>
+<div class="space-before05 spread05">
+<ul>
+<li id="section">
+<span class="en">Half of a violin plot;</span> <span class="sk"></span>
+</li>
+<li id="section">
+<span class="en">A standard boxplot;</span> <span class="sk"></span>
+</li>
+<li id="section">
+<span class="en">A real-data plot;</span> <span class="sk"></span>
+<div class="space-before05 spread05">
+<ul>
+<li id="section">
+<span class="en">A scatterplot of the real 1-dimensional data;</span>
+<span class="sk"></span>
+</li>
+<li id="section">
+<span class="en">Random jitter so that there is less overlapping;</span>
+<span class="sk"></span>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+
+<section id="facet-grids-facet-mriežky"
+class="title-slide slide level2">
+<h2><span class="en">Facet Grids</span> <span class="sk">Facet
+mriežky</span></h2>
+<p><span class="subtitle"><span><span class="en">Interaction
+Plots</span> <span class="sk">Grafy interakcií</span></span></span></p>
+<div class="columns">
+<div class="column" style="width:60%;">
+<p><img data-src="images/data/plots/facet_2d.svg"
+style="width:100.0%" /></p>
+</div><div class="column spread15" style="width:40%;">
+<div class="space-after15">
+<p><span class="block en">Facet Grids</span> <span
+class="block sk">Facet mriežky</span></p>
+</div>
+<ul>
+<li id="section">
+<span class="en">Group points by:</span> <span class="sk">Zoskupíme body
+podľa:</span>
+<div class="spread05 space-before05">
+<ul>
+<li id="section">
+<span class="en">The values of a discrete variable;</span> <span
+class="sk">Hodnoty diskrétnej premennej;</span>
+</li>
+<li id="section">
+<span class="en">Different combinations of values of 2 discrete
+variables;</span> <span class="sk">Rôzne kombinácie hodnôt 2 diskrétnych
+premenných;</span>
+</li>
+</ul>
+</div>
+</li>
+<li id="section">
+<span class="en">Make the same plot for each of the resulting
+groups;</span> <span class="sk">Vytvoríme ten istý graf pre každú zo
+skupín;</span>
+<div class="spread05 space-before05">
+<ul>
+<li id="section">
+<span class="en">Before we made the same kind of plot for different
+variables.</span> <span class="sk">Predtým sme robili ten istý typ grafu
+pre rôzne premenné.</span>
+</li>
+<li id="section">
+<span class="en">Here we are going across values of 1 or 2 variables
+instead.</span> <span class="sk">Tu namiesto toho iterujeme cez hodnoty
+1 alebo 2 premenných.</span>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section>
+<section id="misleading-plots-zavádzajúce-grafy"
+class="title-slide slide level1 empty">
+<h1 class="empty"><span class="en">Misleading Plots</span> <span
+class="sk">Zavádzajúce grafy</span></h1>
+<p><img data-src="images/data/misleading_plots/rtvs_ockovanie.jpg"
+style="width:60.0%" /></p>
+</section>
+<section id="heading1-1" class="title-slide slide level2">
+<h2><span><span class="en">Misleading Plots</span> <span
+class="sk">Zavádzajúce grafy</span></span> (1)</h2>
+<div class="spread05 space-after">
+<ul>
+<li id="section">
+<span class="en">Be careful with your plots: it is easy to make them
+misleading;</span> <span class="sk">Dávajte si pozor na grafy: je veľmi
+ľahké vytvoriť zavádzajúce;</span>
+</li>
+<li id="section">
+<span class="en">Here are a few examples;</span> <span class="sk">Tu je
+zopár príkladov;</span>
+</li>
+</ul>
+</div>
+<p><span class="en block">Percentages don’t add up to 100%</span> <span
+class="sk block">Percentá sa nesčítavajú na 100%</span></p>
+<figure>
+<img data-src="images/data/misleading_plots/rtvs_ockovanie.jpg"
+style="width:80.0%"
+alt="https://www.rtvs.sk/televizia/archiv/17088/260369" />
+<figcaption aria-hidden="true"><a
+href="https://www.rtvs.sk/televizia/archiv/17088/260369">https://www.rtvs.sk/televizia/archiv/17088/260369</a></figcaption>
+</figure>
+</section>
+
+<section id="heading1-2" class="title-slide slide level2">
+<h2><span><span class="en">Misleading Plots</span> <span
+class="sk">Zavádzajúce grafy</span></span> (2)</h2>
+<div class="spread05 space-after">
+<ul>
+<li id="section">
+<span class="en">Be careful with your plots: it is easy to make them
+misleading;</span> <span class="sk">Dávajte si pozor na grafy: je veľmi
+ľahké vytvoriť zavádzajúce;</span>
+</li>
+<li id="section">
+<span class="en">Here are a few examples;</span> <span class="sk">Tu je
+zopár príkladov;</span>
+</li>
+</ul>
+</div>
+<p><span class="en block">Clipped Axes</span> <span
+class="sk block">Orezané osi</span></p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img
+data-src="images/data/misleading_plots/average_house_price_1.png"
+data-onslide="1-" style="width:80.0%" /></p>
+</div><div class="column" style="width:50%;">
+<p><img
+data-src="images/data/misleading_plots/average_house_price_2.png"
+data-onslide="2-" style="width:80.0%" /></p>
+</div>
+</div>
+<div class="centering footnotesize">
+<p><a
+href="https://www.youtube.com/watch?v=GEsjMbTPiZM">https://www.youtube.com/watch?v=GEsjMbTPiZM</a></p>
+</div>
+</section>
+
+<section id="heading1-3" class="title-slide slide level2">
+<h2><span><span class="en">Misleading Plots</span> <span
+class="sk">Zavádzajúce grafy</span></span> (3)</h2>
+<div class="spread05 space-after">
+<ul>
+<li id="section">
+<span class="en">Be careful with your plots: it is easy to make them
+misleading;</span> <span class="sk">Dávajte si pozor na grafy: je veľmi
+ľahké vytvoriť zavádzajúce;</span>
+</li>
+<li id="section">
+<span class="en">Here are a few examples;</span> <span class="sk">Tu je
+zopár príkladov;</span>
+</li>
+</ul>
+</div>
+<p><span class="en block">Data Points Left Out</span> <span
+class="sk block">Vynechané dátové body</span></p>
+<div data-only="1">
+<figure>
+<img data-src="images/data/misleading_plots/hurricanes_1.png"
+style="width:80.0%" alt="https://www.youtube.com/watch?v=GEsjMbTPiZM" />
+<figcaption aria-hidden="true"><a
+href="https://www.youtube.com/watch?v=GEsjMbTPiZM">https://www.youtube.com/watch?v=GEsjMbTPiZM</a></figcaption>
+</figure>
+</div>
+<div data-only="2">
+<figure>
+<img data-src="images/data/misleading_plots/hurricanes_2.png"
+style="width:80.0%" alt="https://www.youtube.com/watch?v=GEsjMbTPiZM" />
+<figcaption aria-hidden="true"><a
+href="https://www.youtube.com/watch?v=GEsjMbTPiZM">https://www.youtube.com/watch?v=GEsjMbTPiZM</a></figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section>
+<section id="dimensionality-reduction-znižovanie-rozmeru-dát"
+class="title-slide slide level1 empty">
+<h1 class="empty"><span class="en">Dimensionality Reduction</span> <span
+class="sk">Znižovanie rozmeru dát</span></h1>
+<div class="negspace-before15 space-after15 spread05">
+<ul>
+<li id="section">
+<span class="en">Most data is much more than 2-dimensional;</span> <span
+class="sk">Väčšina dát je oveľa viac než 2-rozmerná;</span>
+</li>
+<li id="section">
+<span class="en">Dimensionality reduction is very useful in getting 2D
+visualizations;</span> <span class="sk">Znižovanie rozmeru dát je veľmi
+užitočné pri tvorbe 2D vizualizácií;</span>
+</li>
+</ul>
+</div>
+<p><img data-src="images/dimred/mnist_umap.svg"
+style="width:50.0%" /></p>
+</section>
+<section id="heading1" class="title-slide slide level2">
+<h2><span><span class="en">Dimensionality Reduction</span> <span
+class="sk">Znižovanie rozmeru dát</span></span></h2>
+<div class="columns">
+<div class="column spread15 space-before" style="width:50%;">
+<ul>
+<li id="section">
+<span class="en">Applications:</span> <span class="sk">Aplikácie:</span>
+<ul>
+<li id="section">
+<span class="en">Visualization of high-dimensional data.</span> <span
+class="sk">Vizualizácia vysokorozmerných dát.</span>
+</li>
+<li id="section">
+<span class="en">Lowering dimensionality before expensive
+operations.</span> <span class="sk">Znižovanie rozmeru pred výpočtovo
+náročnými operáciami.</span>
+</li>
+<li id="section">
+…
+</li>
+</ul>
+</li>
+<li id="section">
+<span class="en">Best-known methods:</span> <span
+class="sk">Najznámejšie metódy:</span>
+<ul>
+<li id="pca">
+PCA;
+</li>
+<li id="t-sne">
+t-SNE;
+</li>
+<li id="umap">
+UMAP;
+</li>
+<li id="section">
+…
+</li>
+</ul>
+</li>
+<li id="section">
+<span class="en">Example: visualization of the MNIST dataset – <span
+class="math inline">\(28 \times 28\)</span> images (784-dimensional
+space) – in 2D.</span> <span class="sk">Príklad: vizualizácia dátovej
+množiny MNIST – obrázky <span class="math inline">\(28 \times
+28\)</span> (784-rozmerný priestor) – v 2D.</span>
+</li>
+</ul>
+</div><div class="column centering" style="width:50%;">
+<p><img data-src="images/dimred/mnist_samples.jpg"
+class="negspace-after negspace-before075" style="width:100.0%" /></p>
+<p><span class="math inline">\(\downarrow\)</span></p>
+<p><img data-src="images/dimred/mnist_umap.svg"
+style="width:80.0%" /></p>
+</div>
+</div>
+</section>
+
+<section
+id="pca-principle-component-analysis-pca-analýza-hlavných-komponentov"
+class="title-slide slide level2">
+<h2><span class="en">PCA: Principle Component Analysis</span> <span
+class="sk">PCA: analýza hlavných komponentov</span></h2>
+<p><span class="subtitle"><span><span class="en">Dimensionality
+Reduction</span> <span class="sk">Znižovanie rozmeru
+dát</span></span></span></p>
+<div class="columns">
+<div class="column spread025" style="width:40%;">
+<ul>
+<li id="section">
+<span class="en">Principal component analysis.</span> <span
+class="sk">Principal component analysis.</span>
+</li>
+<li id="section">
+<span class="en"><strong>Linear</strong>: fast, but cannot capture
+nonlinear relationships.</span> <span
+class="sk"><strong>Lineárne:</strong> rýchle, ale nevie zachytiť
+nelineárne vzťahy.</span>
+</li>
+<li id="section" class="space-before" data-onslide="2-">
+<span class="en">The idea: form a new orthogonal basis, such
+that:</span> <span class="sk">Idea: vytvoriť novú ortogonálnu bázu tak,
+aby:</span>
+<ul>
+<li id="section">
+<span class="en">The first principal component corresponds to the
+direction with the <strong>greatest variance</strong>.</span> <span
+class="sk">Prvý hlavný komponent zodpovedá smeru, v ktorom je v dátach
+<strong>najväčší rozptyl</strong>.</span>
+<ul>
+<li id="section">
+<span class="en">The intuition is that it carries the most
+information.</span> <span class="sk">Intuícia je, že taký smer nesie
+najviac informácie.</span>
+</li>
+</ul>
+</li>
+<li id="section">
+<span class="en">Further principal components are highest-variance
+directions that are also <strong>orthogonal</strong> to previous
+components.</span> <span class="sk">Ďalšie komponenty sú smery s
+najväčším rozptylom, ktoré sú ale aj <strong>ortogonálne</strong> voči
+predošlým komponentom.</span>
+</li>
+</ul>
+</li>
+<li id="section" class="space-before" data-onslide="2-">
+<span class="en">It is necessary to <strong>normalize</strong> data
+before applying PCA.</span> <span class="sk">Dáta je pred použitím PCA
+potrebné <strong>normalizovať</strong>.</span>
+</li>
+</ul>
+</div><div class="column" style="width:60%;">
+<ul>
+<li id="section" class="space-after05" data-onslide="3-">
+<span class="en">To reduce dimensionality, one discards the last few
+components:</span> <span class="sk">Zníženie rozmeru sa robí odstránením
+pár posledných komponentov:</span>
+</li>
+</ul>
+<div data-only="1">
+<figure>
+<img data-src="images/dimred/pca_points.svg" style="width:100.0%"
+alt="An example: linear data + gaussian noise. Príklad: dáta z priamky + gaussovský šum." />
+<figcaption aria-hidden="true"><span class="en">An example: linear data
++ gaussian noise.</span> <span class="sk">Príklad: dáta z priamky +
+gaussovský šum.</span></figcaption>
+</figure>
+</div>
+<div data-only="2">
+<figure>
+<img data-src="images/dimred/pca_components.svg" style="width:100.0%"
+alt="An example: the principal components. Príklad: hlavné komponenty." />
+<figcaption aria-hidden="true"><span class="en">An example: the
+principal components.</span> <span class="sk">Príklad: hlavné
+komponenty.</span></figcaption>
+</figure>
+</div>
+<div data-only="3">
+<figure>
+<img data-src="images/dimred/pca_reconstruct.svg" style="width:100.0%"
+alt="An example: data reconstructed from the 1st principal component. Príklad: rekonštrukcia dát podľa 1. komponentu." />
+<figcaption aria-hidden="true"><span class="en">An example: data
+reconstructed from the 1st principal component.</span> <span
+class="sk">Príklad: rekonštrukcia dát podľa 1.
+komponentu.</span></figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+
+<section id="pca-on-the-mnist-dataset-pca-na-dátovej-množine-mnist"
+class="title-slide slide level2">
+<h2><span class="en">PCA on the MNIST Dataset</span> <span
+class="sk">PCA na dátovej množine MNIST</span></h2>
+<p><span class="subtitle"><span><span class="en">Dimensionality
+Reduction</span> <span class="sk">Znižovanie rozmeru
+dát</span></span></span></p>
+<div data-only="1">
+<ul>
+<li id="section">
+<span class="en">Let us again take the MNIST dataset as our
+example:</span> <span class="sk">Za príklad si znovu vezmime dátovú
+množinu MNIST:</span>
+</li>
+</ul>
+<p><img data-src="images/dimred/mnist_data.svg"
+style="width:50.0%" /></p>
+</div>
+<div data-only="2">
+<ul>
+<li id="section">
+<span class="en">We can observe some structure after projecting to 2D
+using PCA:</span> <span class="sk">V PCA projekcii do 2D vidno určitú
+štruktúru:</span>
+</li>
+</ul>
+<p><img data-src="images/dimred/mnist_pca.svg"
+style="width:75.0%" /></p>
+</div>
+<div data-only="3">
+<ul>
+<li id="section">
+<span class="en">But clusters not clearly separated – PCA cannot handle
+nonlinear relationships:</span> <span class="sk">Ale zhluky nie sú jasne
+oddelené – PCA si nevie rady s nelineárnymi vzťahmi:</span>
+</li>
+</ul>
+<p><img data-src="images/dimred/mnist_pca_nocolor.svg"
+style="width:85.0%" /></p>
+</div>
+</section>
+
+<section
+id="pca-in-visualization-the-problem-problém-pca-vo-vizualizácii"
+class="title-slide slide level2">
+<h2><span class="en">PCA in Visualization: The Problem</span> <span
+class="sk">Problém PCA vo vizualizácii</span></h2>
+<p><span class="subtitle"><span><span class="en">Dimensionality
+Reduction</span> <span class="sk">Znižovanie rozmeru
+dát</span></span></span></p>
+<ul>
+<li id="section">
+<span class="en">In PCA we are concentrating on the highest variance:
+i.e. large distances.</span> <span class="sk">V PCA sa sustredíme na
+najväčší rozptyl: t.j. veľké vzdialenosti.</span>
+</li>
+<li id="section">
+<span class="en">It often makes more sense to concentrate on small
+distances.</span> <span class="sk">Často dáva väčší zmysel sústrediť sa
+na malé vzdialenosti.</span>
+</li>
+<li id="section">
+<span class="en">Example: the Swiss roll – a 2D manifold embedded in 3D
+space.</span> <span class="sk">Príklad: švajčiarska rolka – 2D povrch
+vložený do 3D priestoru.</span>
+</li>
+</ul>
+<p><img data-src="images/dimred/swiss_roll_labelled.svg"
+style="width:75.0%" /></p>
+</section>
+
+<section
+id="dimensionality-reduction-through-graph-layout-znižovanie-rozmeru-cez-layout-grafov"
+class="title-slide slide level2">
+<h2><span class="en">Dimensionality Reduction through Graph
+Layout</span> <span class="sk">Znižovanie rozmeru cez layout
+grafov</span></h2>
+<p><span class="subtitle"><span><span class="en">Dimensionality
+Reduction</span> <span class="sk">Znižovanie rozmeru
+dát</span></span></span></p>
+<div class="spread025">
+<ul>
+<li id="section">
+<span class="en">The two best known recent methods, t-SNE and UMAP, both
+fall into this category.</span> <span class="sk">Dve najznámejšie
+nedávne metódy, t-SNE a UMAP, patria obe do tejto kategórie.</span>
+</li>
+<li id="section">
+<span class="en">The main idea:</span> <span class="sk">Základná
+myšlienka:</span>
+<ul>
+<li id="section">
+<span class="en">Transforms the high-dimensional data into a
+graph.</span> <span class="sk">Transformovať vysokorozmerné dáta na
+graf.</span>
+</li>
+<li id="section">
+<span class="en">Creates another low-dimensional graph.</span> <span
+class="sk">Vytvoriť ďalší nízkorozmerný graf.</span>
+</li>
+<li id="section">
+<span class="en">Optimizes the low-dim. graph to be as similar to the
+high-dim. one as possible.</span> <span class="sk">Optimalizovať
+nízkoroz. graf tak, aby sa čo najviac podobal vysokorozmernému.</span>
+</li>
+</ul>
+</li>
+<li id="section">
+<span class="en">Can handle nonlinear relationships; Focus on preserving
+small distances.</span> <span class="sk">Vedia pracovať s nelineárnymi
+vzťahmi; Zameranie na zachovanie malých vzdialeností.</span>
+</li>
+</ul>
+</div>
+<div class="columns space-before075">
+<div class="column" style="width:50%;">
+<figure>
+<img data-src="images/dimred/mnist_tsne.svg" style="width:100.0%"
+alt="MNIST, t-SNE" />
+<figcaption aria-hidden="true">MNIST, t-SNE</figcaption>
+</figure>
+</div><div class="column" style="width:50%;">
+<figure>
+<img data-src="images/dimred/mnist_umap.svg" style="width:100.0%"
+alt="MNIST, UMAP" />
+<figcaption aria-hidden="true">MNIST, UMAP</figcaption>
+</figure>
+</div>
+</div>
+</section>
+
+<section id="t-sne-vs.-umap" class="title-slide slide level2">
+<h2>t-SNE vs. UMAP</h2>
+<p><span class="subtitle"><span><span class="en">Dimensionality
+Reduction</span> <span class="sk">Znižovanie rozmeru
+dát</span></span></span></p>
+<div class="columns space-before075">
+<div class="column spread1 vcentering" style="width:35%;">
+<ul>
+<li id="section">
+<span class="en">UMAP is a bit more mathematically advanced:</span>
+<span class="sk">Metóda UMAP je matematicky pokročilejšia:</span>
+<ul>
+<li id="section">
+<span class="en">It has a strong theoretical foundation grounded in
+topology theorems;</span> <span class="sk">Má silné teoretické základy
+založené na topologických teorémach;</span>
+</li>
+<li id="section">
+<span class="en">It has a smarter approach to controlling which points
+are treated as neighbours;</span> <span class="sk">Má šikovnejší prístup
+k riadeniu toho, ktoré body sa považujú za susedné;</span>
+</li>
+<li id="section">
+<span class="en">It uses a different loss function;</span> <span
+class="sk">Používa inú kriteriálnu funkciu;</span>
+</li>
+</ul>
+</li>
+<li id="section">
+<span class="en">Thanks to this:</span> <span class="sk">Vďaka
+tomu:</span>
+<ul>
+<li id="section">
+<span class="en">UMAP is <strong>incomparably faster</strong> than
+t-SNE;</span> <span class="sk">UMAP je <strong>neporovnateľne
+rýchlejšia</strong> než t-SNE;</span>
+</li>
+<li id="section">
+<span class="en">UMAP is <strong>better at capturing the global
+structure</strong> – even though, like t-SNE, it’s focus is on local
+structure.</span> <span class="sk">UMAP <strong>lepšie zachytáva
+globálnu štruktúru</strong> – hoci inak sa, ako t-SNE, zameriava hlavne
+na lokálnu štruktúru.</span>
+</li>
+</ul>
+</li>
+</ul>
+</div><div class="column" style="width:1%;">
+
+</div><div class="column vcentering" style="width:64%;">
+<div data-only="1-2">
+<ul>
+<li id="section">
+<span class="en">Projecting a 3D mammoth to 2D using UMAP:</span> <span
+class="sk">Projekcia 3D mamuta do 2D pomocou UMAP:</span>
+<ul>
+<li id="section" data-onslide="2-">
+<span class="en"><code>n_neighbors</code> controls how much global
+structure we want to preserve.</span> <span
+class="sk"><code>n_neighbors</code> určuje koľko globálnej štruktúry
+chceme zachovať.</span>
+</li>
+</ul>
+</li>
+</ul>
+<p><img data-src="images/dimred/mammoth_umap_1.png" class="space-before"
+data-only="1" style="width:100.0%" /> <img
+data-src="images/dimred/mammoth_umap_2.png" class="space-before"
+data-only="2" style="width:100.0%" /></p>
+</div>
+<div data-only="3-4">
+<ul>
+<li id="section">
+<span class="en">In t-SNE, perplexity controls the amount of global
+structure to preserve;</span> <span class="sk">V t-SNE určuje mieru
+zachovania globálnej štruktúry perplexita;</span>
+<ul>
+<li id="section">
+<span class="en">t-SNE is always slow, but its scaling with perplexity
+is especially bad.</span> <span class="sk">t-SNE je vždy pomalé, ale
+jeho škálovanie s perplexitou je obzvlášť zlé.</span>
+</li>
+</ul>
+</li>
+</ul>
+<p><img data-src="images/dimred/mammoth_tsne_umap_1.png"
+class="space-before" data-only="3" style="width:100.0%" /> <img
+data-src="images/dimred/mammoth_tsne_umap_2.png" class="space-before"
+data-only="4" style="width:100.0%" /></p>
+</div>
+<div class="centering footnotesize">
+<p><a
+href="https://pair-code.github.io/understanding-umap/">https://pair-code.github.io/understanding-umap/</a></p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section>
+<section id="thank-you-for-your-attention-ďakujem-za-pozornosť"
+class="title-slide slide level1 empty">
+<h1 class="empty"><span class="en">Thank you for your attention!</span>
+<span class="sk">Ďakujem za pozornosť!</span></h1>
+<div class="columns" style="margin-top: 2em">
+<div class="column centering vcentering" style="width:33%;">
+<p>Michal Gregor <br /> <a
+href="mailto:michal.gregor@uniza.sk">michal.gregor@uniza.sk</a> <br />
+<a href="https://michalgregor.gitlab.io">michalgregor.gitlab.io</a>
+<br /> FEIT, KRIS; LUIZA <br /> <span class="en">University of
+Žilina</span> <span class="sk">Žilinská univerzita</span></p>
+</div><div class="column centering vcentering" style="width:33%;">
+<p><img data-src="modules/feit_logo.svg" style="width:100.0%" /></p>
+</div><div class="column centering vcentering" style="width:33%;">
+<div class="en">
+<p><img data-src="modules/luiza_logo_full_en.svg"
+style="width:100.0%" /></p>
+</div>
+<div class="sk">
+<p><img data-src="modules/luiza_logo_full.svg"
+style="width:100.0%" /></p>
+</div>
+</div>
+</div>
+</section>
+<section id="references-zdroje" class="title-slide slide level2">
+<h2><span class="en">References</span> <span
+class="sk">Zdroje</span></h2>
+<div id="refs" class="references csl-bib-body" role="doc-bibliography">
+<div id="ref-wikiCorrelationCausation" class="csl-entry"
+role="doc-biblioentry">
+[1] Correlation does not imply causation. In [online]. [cit.
+2020-02-21]. Dostupné na internete: &lt;<a
+href="https://en.wikipedia.org/wiki/Correlation_does_not_imply_causation">https://en.wikipedia.org/wiki/Correlation_does_not_imply_causation</a>&gt;.
+</div>
+<div id="ref-jordanDownSyndrome2018" class="csl-entry"
+role="doc-biblioentry">
+[2] JORDAN, M. Artificial Intelligence — The Revolution Hasn’t Happened
+Yet. In [online]. 2020. Dostupné na internete: &lt;<a
+href="https://medium.com/@mijordan3/artificial-intelligence-the-revolution-hasnt-happened-yet-5e1d5812e1e7">https://medium.com/@mijordan3/artificial-intelligence-the-revolution-hasnt-happened-yet-5e1d5812e1e7</a>&gt;.
+</div>
+</div>
+</section>
+</section>
+    </div>
+  </div>
+
+  <script src="./reveal/reveal.js/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: true,
+        // Display a presentation progress bar
+        progress: true,
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+        // Push each slide change to the browser history
+        history: true,
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+        // Enable the slide overview mode
+        overview: true,
+        // Vertical centering of slides
+        center: true,
+        // Enables touch navigation on devices with touch input
+        touch: true,
+        // see https://github.com/hakimel/reveal.js/#navigation-mode
+        navigationMode: 'default',
+        // Turns fragments on and off globally
+        fragments: true,
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+        // Transition style
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+        // Transition speed
+        transitionSpeed: 'default', // default/fast/slow
+        // Transition style for full page slide backgrounds
+        backgroundTransition: 'fade', // none/fade/slide/convex/concave/zoom
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+        width: 960,
+        height: 700,
+        math: {
+          mathjax: 'reveal/mathjax/tex-chtml.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+        menu: {
+          custom: [{
+            title: 'Printouts', icon: '<i class="fa fa-file-pdf">',
+            content: '<ul class="slide-menu-items"><li class="slide-menu-item"><a class="slide-menu-item-title" onclick="window.location.assign(updateURLParameter(window.location.href, \'print-pdf\', \'\'));">Printout w/o notes</a></li><li class="slide-menu-item"><a class="slide-menu-item-title" onclick="window.location.assign(updateURLParameter(updateURLParameter(window.location.href, \'print-pdf\', \'\'), \'showNotes\', \'separate-page\'));">Printout w/ notes</a></li></ul>'
+          }, {
+            title: 'About', icon: '<i class="fa fa-info"></i>', content: 
+            `<p class="slide-menu-item">
+                Instructions:<br>
+                Press '?' for keyboard shortcuts. To obtain a PDF-file of the slides open this <a href="?print-pdf" target="_blank">link</a> in Google Chrome and use the print dialog (this may not work for other browsers).
+                </p>
+                <span class="slide-menu-item">Author: <a href="https://github.com/rajgoel/reveal.js-plugins">Asvin Goel</a></span>`
+          }]
+        },
+        langs: {
+            langs: 'en:English,sk:Slovenčina'    
+        },
+        chalkboard: {
+            toggleChalkboardButton: { left: "210px", bottom: "30px", top: "auto", right: "auto" },
+            toggleNotesButton: { left: "182px", bottom: "30px", top: "auto", right: "auto" },
+        },
+        keyboard: {
+            39: function(event) {
+                if(event.shiftKey || Reveal.isOverview()) Reveal.navigateRight();
+                else Reveal.navigateNext();
+            }, // Right Arrow
+            37: function(event) {
+                if(event.shiftKey || Reveal.isOverview()) Reveal.navigateLeft();
+                else Reveal.navigatePrev();
+            },  // Left Arrow
+            78: function(event) {
+                if(Reveal.isOverview()) Reveal.navigateNext();
+                else Reveal.navigateRight();
+            }, // n key
+            80: function(event) {
+                if(Reveal.isOverview()) Reveal.navigatePrev();
+                else Reveal.navigateLeft();
+            }, // p key
+
+            // for chalkboard.js
+                        67: function() { RevealChalkboard.toggleNotesCanvas() }, // toggle notes canvas when 'c' is pressed
+	    66: function() { RevealChalkboard.toggleChalkboard() }, // toggle chalkboard when 'b' is pressed
+	    46: function() { RevealChalkboard.clear() },	// clear chalkboard when 'DEL' is pressed
+	     8: function() { RevealChalkboard.reset() },	// reset chalkboard data on current slide when 'BACKSPACE' is pressed
+	    68: function() { RevealChalkboard.download() },	// downlad recorded chalkboard drawing when 'd' is pressed
+	    88: function() { RevealChalkboard.colorNext() },	// cycle colors forward when 'x' is pressed
+	    89: function() { RevealChalkboard.colorPrev() },	// cycle colors backward when 'y' is pressed
+                    },
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: './reveal/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: './reveal/reveal.js/plugin/zoom-js/zoom.js', async: true },
+          { src: './reveal/reveal.js/plugin/math/math.js', async: true },
+          { src: './reveal/reveal.js/plugin/notes/notes.js', async: true },
+          { src: './reveal/reveal.js/plugin/menu/menu.js', async: true },
+          { src: './reveal/reveal.js/../lecture_js_plugins/langs/langs.js', async: true },
+          { src: './reveal/reveal.js/../lecture_js_plugins/overlays/overlays.js', async: false },
+          { src: './reveal/reveal.js/../lecture_js_plugins/scrollable_slides/scrollable_slides.js', async: false },
+          { src: './reveal/reveal.js/../lecture_js_plugins/styling_commands/styling_commands.js', async: false },
+          { src: './reveal/reveal.js/../lecture_js_plugins/plt_anim/plt_anim.js', async: false },
+          { src: './reveal/reveal.js/../lecture_js_plugins/chalkboard/chalkboard.js' },
+        ]
+      });
+    </script>
+    </body>
+</html>

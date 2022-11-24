@@ -46,7 +46,7 @@ langs: "en:English,sk:Slovenčina"
 
 6789
 
-## [Classification]{.en} [Klasifikácia]{.sk}
+## [Classification 12]{.en} [Klasifikácia 12]{.sk}
 [{{heading1}}]{.subtitle}
 
 * [We already know how to do classification so let's start with that;]{.en}

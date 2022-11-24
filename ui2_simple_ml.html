@@ -1,0 +1,2580 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <title>L2: Simple Machine Learning Methods L2: Jednoduché metódy strojového učenia</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="./reveal/reveal.js/css/reset.css">
+  <link rel="stylesheet" href="./reveal/reveal.js/css/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+    }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
+  </style>
+  <link rel="stylesheet" href="reveal/uniza_theme/luiza.css" id="theme">
+  <link rel="stylesheet" href="reveal/custom.css"/>
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? './reveal/reveal.js/css/print/pdf.css' : './reveal/reveal.js/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+
+    function updateURLParameter(url, param, paramVal) {
+        var TheAnchor = null;
+        var newAdditionalURL = "";
+        var tempArray = url.split("?");
+        var baseURL = tempArray[0];
+        var additionalURL = tempArray[1];
+        var temp = "";
+
+        if (additionalURL) {
+            var tmpAnchor = additionalURL.split("#");
+            var TheParams = tmpAnchor[0];
+                TheAnchor = tmpAnchor[1];
+            if(TheAnchor)
+                additionalURL = TheParams;
+
+            tempArray = additionalURL.split("&");
+
+            for (var i=0; i<tempArray.length; i++)
+            {
+                if(tempArray[i].split('=')[0] != param)
+                {
+                    newAdditionalURL += temp + tempArray[i];
+                    temp = "&";
+                }
+            }        
+        }
+        else {
+            var tmpAnchor = baseURL.split("#");
+            var TheParams = tmpAnchor[0];
+                TheAnchor  = tmpAnchor[1];
+
+            if(TheParams)
+                baseURL = TheParams;
+        }
+
+        if(TheAnchor)
+            paramVal += "#" + TheAnchor;
+
+        var rows_txt = temp + "" + param + "=" + paramVal;
+        return baseURL + "?" + newAdditionalURL + rows_txt;
+    }
+  </script>
+  <!--[if lt IE 9]>
+  <script src="./reveal/reveal.js/lib/js/html5shiv.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+<section class="frontslide slide" id="title-slide">
+  <h1 class="title "><span class="en">L2: Simple Machine Learning Methods</span> <span class="sk">L2: Jednoduché metódy strojového učenia</span></h1>
+  <span class="subtitle"><span class="en">Machine Learning</span> <span class="sk">Strojové učenie</span></span>
+<div class="columns">
+<div class="column intro-left-column">
+<div class="intro-left-column-inner">
+    <div class="author">
+            <div class="author-name">Michal Gregor</div>
+                    <div class="author-email">michal.gregor@uniza.sk</div>
+                            <div class="author-affiliation"><span class="en">
+<div>
+Department of Control
+</div>
+<div style="margin-bottom:15px">
+and Information Systems
+</div>
+<div>
+University of Žilina
+</div>
+</span> <span class="sk">
+<div>
+Katedra riadiacich
+</div>
+<div style="margin-bottom:15px">
+a informačných systémov
+</div>
+<div>
+Žilinská univerzita
+</div>
+</span></div>
+                </div>
+  <div class="intro-left"><p style="margin-top: 50px;">
+<img src="modules/feit_logo.svg" class="inline-img" style="height:100px" /> <span class="en"><img src="modules/luiza_logo_full_en.svg" class="inline-img" style="height:85px" /></span> <span class="sk"><img src="modules/luiza_logo_full.svg" class="inline-img" style="height:85px" /></span>
+</p></div>
+</div>
+</div><div class="column intro-right-column">
+    <div class="intro-right-column-inner"><img src="modules/luiza_intro.png" style="height: 400px; margin-top: 30px; margin-bottom: 70px;"></div>
+</div>
+</div>
+</section>
+
+<section id="simple-machine-learning-methods-jednoduché-metódy-strojového-učenia" class="title-slide slide level1">
+<h1><span class="en">Simple Machine Learning Methods</span> <span class="sk">Jednoduché metódy strojového učenia</span></h1>
+<div class="space-before1">
+<p><span class="block en">Machine Learning Methods</span> <span class="block sk">Metódy strojového učenia</span></p>
+<p><span class="en">Today we are going to cover a few simple machine learning methods:</span> <span class="sk">Dnes sa budeme venovať niekoľkým jednoduchým metódam strojového učenia:</span></p>
+</div>
+<div class="spread1 space-before1">
+<ul>
+<li id="section">
+<span class="en"><strong><span class="math inline">\(k\)</span>-nearest neighbours:</strong> a lazy, non-parametric method, which only looks at distances;</span> <span class="sk"><strong><span class="math inline">\(k\)</span> najbližších susedov:</strong> lenivá, neparametrická metóda, ktorá pozerá len na vzdialenosti;</span>
+</li>
+<li id="section" data-only="2-">
+<span class="en"><strong>The naïve Bayes classifier:</strong> a parametric approach, which looks at the input features, but individually;</span> <span class="sk"><strong>Naivný bayesovský klasifikátor:</strong> parametrický prístup, ktorý pozerá na vstupné príznaky, ale jednotlivo;</span>
+</li>
+<li id="section" data-only="3-">
+<span class="en"><strong>Decision trees:</strong> which can take combinations of input features into account.</span> <span class="sk"><strong>Rozhodovacie stromy:</strong> ktoré vedia zobrať do úvahy aj kombinácie príznakov.</span>
+</li>
+<li id="section" data-only="4-">
+<span class="en"><strong>Ensembles:</strong> groups of models that make predictions by voting/averaging.</span> <span class="sk"><strong>Komisie</strong> (ensembles): skupiny modelov, ktoré robia predikcie hlasovaním/priemerovaním.</span>
+</li>
+</ul>
+</div>
+</section>
+
+<section>
+<section id="knn-lazy-vs.-parametric-methods-knn-lenivé-vs.-parametrické-metódy" class="title-slide slide level1 empty">
+<h1 class="empty"><span class="en">KNN: Lazy vs. Parametric Methods</span> <span class="sk">KNN: Lenivé vs. parametrické metódy</span></h1>
+<div class="columns">
+<div class="column" style="width:5%;">
+
+</div><div class="column" style="width:33%;">
+<p><img data-src="images/knn/knn_algo_point.svg" style="width:100.0%" /></p>
+</div><div class="column" style="width:31%;">
+<p><img data-src="images/bayes/naive_bayes.svg" style="width:50.0%" /></p>
+</div><div class="column" style="width:31%;">
+<p><img data-src="images/dtree/dtree_zmrzlina_1.svg" style="width:50.0%" /></p>
+</div>
+</div>
+</section>
+<section id="heading1" class="title-slide slide level2">
+<h2><span><span class="en">KNN: Lazy vs. Parametric Methods</span> <span class="sk">KNN: Lenivé vs. parametrické metódy</span></span></h2>
+<div class="columns">
+<div class="column spread15" style="width:50%;">
+<ul>
+<li id="section">
+<span class="en">We talked about <span class="math inline">\(k\)</span> nearest neighbours (<strong>KNN</strong>) last.</span> <span class="sk">Naposledy sme hovorili o <span class="math inline">\(k\)</span> najbližších susedoch (<strong>KNN</strong>).</span>
+<ul>
+<li id="section">
+<span class="en">Stores the data;</span> <span class="sk">Uloží si dáta;</span>
+</li>
+<li id="section">
+<span class="en">Makes predictions based on <strong>distance</strong> in input space.</span> <span class="sk">Predikcie robí na základe <strong>vzdialenosti</strong> vo vstupnom priestore.</span>
+</li>
+</ul>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en">Methods of this kind are called <strong>lazy</strong> and <strong>non-parametric</strong>:</span> <span class="sk">Metódy tohto druhu sa nazývajú <strong>lenivé</strong> alebo <strong>neparametrické</strong>:</span>
+<ul>
+<li id="section">
+<span class="en">They use the data directly;</span> <span class="sk">Dáta používajú priamo;</span>
+</li>
+<li id="section">
+<span class="en">They do not use it to learn parameters.</span> <span class="sk">Nepoužívajú ich na naladenie parametrov.</span>
+</li>
+</ul>
+</li>
+<li id="section" data-onslide="3-">
+<span class="en">Let’s explore some <strong>parametric</strong> methods today:</span> <span class="sk">Dnes sa pozrime na pár <strong>parametrických</strong> metód:</span>
+<ul>
+<li id="section">
+<span class="en">The naïve Bayes classifier;</span> <span class="sk">naivný bayesovský klasifikátor;</span>
+</li>
+<li id="section">
+<span class="en">Decision trees;</span> <span class="sk">rozhodovacie stromy;</span>
+</li>
+<li id="section">
+<span class="en">Ensembles, …</span> <span class="sk">komisie modelov, …</span>
+</li>
+</ul>
+</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><img data-src="images/knn/knn_algo_point.svg" style="width:100.0%" /></p>
+<div data-only="3-">
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="images/bayes/naive_bayes.svg" style="width:70.0%" /></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="images/dtree/dtree_zmrzlina_1.svg" style="width:70.0%" /></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section>
+<section id="the-naïve-bayes-classifier-naivný-bayesovský-klasifikátor" class="title-slide slide level1 empty">
+<h1 class="empty"><span class="en">The Naïve Bayes Classifier</span> <span class="sk">Naivný bayesovský klasifikátor</span></h1>
+<p><img data-src="images/bayes/naive_bayes.svg" style="width:15.0%" /></p>
+</section>
+<section id="a-probabilistic-model-pravdepodobnostný-model" class="title-slide slide level2">
+<h2><span class="en">A Probabilistic Model</span> <span class="sk">Pravdepodobnostný model</span></h2>
+<p><span class="subtitle"><span><span class="en">The Naïve Bayes Classifier</span> <span class="sk">Naivný bayesovský klasifikátor</span></span></span></p>
+<p><span class="en">Why not think in terms of the individual <strong>input features</strong>?</span> <span class="sk">Prečo neuvažovať v zmysle jednotlivých <strong>vstupných príznakov</strong>?</span></p>
+<ul>
+<li id="section">
+<span class="en">Given an input vector <span class="math inline">\(\mathbf{x} = (x_1, x_2, ..., x_N)\)</span>, what is the probability of class <span class="math inline">\(y_k\)</span>?</span> <span class="sk">Ak máme vstupný vektor <span class="math inline">\(\mathbf{x} = (x_1, x_2, ..., x_N)\)</span>, aká je pravdepodobnosť triedy <span class="math inline">\(y_k\)</span>?</span>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en">Bayes rule:</span> <span class="sk">Bayesovo pravidlo:</span>
+</li>
+</ul>
+<div data-onslide="2-">
+<p><span class="math display">\[
+    p(y_k | \mathbf{x}) = 
+    \frac{
+        p(y_k) p(\mathbf{x} | y_k)
+    }{
+        p(\mathbf{x})
+    } =     
+    \frac{
+        p(\mathbf{x}, y_k)
+    }{
+        p(\mathbf{x})
+    }.
+\]</span></p>
+</div>
+<div data-only="3-5" style="margin-top: 2em;">
+<ul>
+<li id="section">
+<span class="en">It is easy to remember:</span> <span class="sk">Dá sa ľahko zapamätať:</span>
+</li>
+</ul>
+<p><span class="math display">\[
+p(\mathbf{x}, y_k) = p(y_k) p(\mathbf{x} | y_k) = p(\mathbf{x}) p(y_k | \mathbf{x})
+\]</span></p>
+<div data-onslide="4-">
+<p><span class="math display">\[
+p(y_k) p(\mathbf{x} | y_k) = p(\mathbf{x}) p(y_k | \mathbf{x})
+\]</span></p>
+</div>
+<div data-onslide="5-">
+<p><span class="math display">\[
+p(y_k | \mathbf{x}) =
+\frac{
+  p(y_k) p(\mathbf{x} | y_k)
+}{
+  p(\mathbf{x})
+}
+\]</span></p>
+</div>
+</div>
+<ul>
+<li id="section" class="space-before1" data-onslide="6-">
+<span class="en">The denominator is constant w.r.t. the class <span class="math inline">\(y_k\)</span>:</span> <span class="sk">Menovateľ je vzhľadom na triedu <span class="math inline">\(y_k\)</span> konštantný.</span>
+</li>
+</ul>
+<div data-only="6-">
+<p><span class="math display">\[
+    p(y_k | \mathbf{x}) \propto p(\mathbf{x}, y_k).
+\]</span></p>
+</div>
+<ul>
+<li id="section" class="space-before1" data-only="7-">
+<span class="en">But how do we keep track of all the probabilities?</span> <span class="sk">Lenže čo so všetkými tými pravdpepodobnosťami?</span>
+</li>
+<li id="section" data-only="7-">
+<span class="en">Plus we would need <strong>too much data</strong>!</span> <span class="sk">Potrebovali by sme aj <strong>príliš veľa dát</strong>!</span>
+</li>
+</ul>
+<div class="small" data-only="7-">
+<p><span class="math display">\[
+\begin{aligned}
+&amp; p(x_1, ..., x_N, y_k) = p(x_1 | x_2, ..., x_N, y_k) p(x_2, ..., x_N, y_k) \\
+&amp;= p(x_1 | x_2, ..., x_N, y_k) p(x_2 | x_3, ..., x_N, y_k) p(x_3, ..., x_N, y_k) \\
+&amp;= p(x_1 | x_2, ..., x_N, y_k) p(x_2 | x_3, ..., x_N, y_k) p(x_3, ..., x_N, y_k) ... p(x_N | y_k) p(y_k)
+\end{aligned}
+\]</span></p>
+</div>
+<aside class="notes">
+<ul>
+<li id="which-we-can-in-principle-easily-estimate-from-co-occurences-in-the-dataset.">
+We express <span class="math inline">\(p(y_k | \mathbf{x})\)</span> in terms of the joint probability of <span class="math inline">\(p(\mathbf{x}, y_k)\)</span>which we can – in principle – easily estimate from co-occurences in the dataset.
+</li>
+<li id="section">
+But if all the dimensions of <span class="math inline">\(\mathbf{x}\)</span> can be interdependent, we would need <strong>so much data</strong>!
+</li>
+</ul>
+</aside>
+</section>
+
+<section id="the-naïve-assumption-naivný-predpoklad" class="title-slide slide level2">
+<h2><span class="en">The Naïve Assumption</span> <span class="sk">Naivný predpoklad</span></h2>
+<p><span class="subtitle"><span><span class="en">The Naïve Bayes Classifier</span> <span class="sk">Naivný bayesovský klasifikátor</span></span></span></p>
+<div class="columns space-after space-before15">
+<div class="column spread15" style="width:70%;">
+<ul>
+<li id="section">
+<span class="en">Let’s assume that inputs are all <strong>mutually independent</strong> given <span class="math inline">\(y_k\)</span>:</span> <span class="sk">Predpokladajme, že vstupy sú <strong>vzájomne nezávislé</strong> ak poznáme <span class="math inline">\(y_k\)</span>:</span> <span class="math display">\[
+\begin{aligned}
+p(y_k | x_1, ..., x_N) &amp;\propto p(y_k) p(x_1 | y_k) p(x_2 | y_k) ... p(x_N | y_k) \\
+&amp;= p(y_k) \prod_{i=1}^{N} p(x_i | y_k).
+\end{aligned}
+\]</span>
+</li>
+<li id="section">
+<span class="en">Now we only need to know <span class="math inline">\(p(x_i | y_k)\)</span> for each input.</span> <span class="sk">Teraz potrebujeme poznať len <span class="math inline">\(p(x_i | y_k)\)</span> pre každý vstup.</span>
+</li>
+</ul>
+</div><div class="column" style="width:30%;">
+<p><img data-src="images/bayes/naive_bayes.svg" style="width:85.0%" /></p>
+</div>
+</div>
+<p><span class="en">The assumption is why the model is called <strong>naïve</strong>.</span> <span class="sk">Model sa nazýva <strong>naivným</strong> kvôli tomuto predpokladu.</span></p>
+<ul>
+<li id="section">
+<span class="en">More sophisticated probabilistic models in AI with prof. Janota.</span> <span class="sk">Sofistikovanejšie pravdepodobnostné modely na UI s prof. Janotom.</span>
+</li>
+</ul>
+</section>
+
+<section id="training-the-classifier-tréning-klasifikátora" class="title-slide slide level2 optional">
+<h2 class="optional"><span class="en">Training the Classifier</span> <span class="sk">Tréning klasifikátora</span></h2>
+<p><span class="subtitle"><span><span class="en">The Naïve Bayes Classifier</span> <span class="sk">Naivný bayesovský klasifikátor</span></span></span></p>
+<ul>
+<li id="section">
+<span class="en">Assuming independence, we only need the conditional probabilities <span class="math inline">\(p(x_i | y_k)\)</span> for each class and all possible inputs.</span> <span class="sk">Pri nezávislosti potrebujeme len podmienené pravdepodobnosti <span class="math inline">\(p(x_i | y_k)\)</span> pre každú triedu a všetky možné vstupy.</span>
+</li>
+<li id="section">
+<span class="en">We can easily estimate these from data by computing the corresponding relative frequencies:</span> <span class="sk">Vieme ich ľahko odhadnúť z dát výpočtom zodpovedajúcich relatívnych početností:</span>
+</li>
+</ul>
+<div class="en" style="font-size: 75%">
+<table>
+<thead>
+<tr class="header">
+<th><strong># obs.</strong></th>
+<th><strong>cone quality</strong></th>
+<th><strong>ice cream quality</strong></th>
+<th><strong>have one?</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>great</td>
+<td>great</td>
+<td>yes</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>great</td>
+<td>good</td>
+<td>yes</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>good</td>
+<td>great</td>
+<td>yes</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>good</td>
+<td>good</td>
+<td>yes</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>good</td>
+<td>poor</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>poor</td>
+<td>poor</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>poor</td>
+<td>poor</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>great</td>
+<td>poor</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>poor</td>
+<td>good</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>good</td>
+<td>good</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sk" style="font-size: 75%">
+<table>
+<thead>
+<tr class="header">
+<th><strong># vzorky</strong></th>
+<th><strong>kvalita kornúta</strong></th>
+<th><strong>kvalita zmrzliny</strong></th>
+<th><strong>dať si?</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>výborná</td>
+<td>výborná</td>
+<td>áno</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>výborná</td>
+<td>dobrá</td>
+<td>áno</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>dobrá</td>
+<td>výborná</td>
+<td>áno</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>dobrá</td>
+<td>dobrá</td>
+<td>áno</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>dobrá</td>
+<td>zlá</td>
+<td>nie</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>zlá</td>
+<td>zlá</td>
+<td>nie</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>zlá</td>
+<td>zlá</td>
+<td>nie</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>výborná</td>
+<td>zlá</td>
+<td>nie</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>zlá</td>
+<td>dobrá</td>
+<td>nie</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>dobrá</td>
+<td>dobrá</td>
+<td>áno</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="centering" data-only="2-" style="font-size: 120%">
+<p><span class="en">Again, more on this in AI with prof. Janota…</span> <span class="sk">Znovu, viac o tom na UI s prof. Janotom…</span></p>
+</div>
+</section>
+</section>
+<section>
+<section id="decision-trees-rozhodovacie-stromy" class="title-slide slide level1 empty">
+<h1 class="empty"><span class="en">Decision Trees</span> <span class="sk">Rozhodovacie stromy</span></h1>
+<p><img data-src="images/dtree/dtree_titanic_pruned.svg" style="width:60.0%" /></p>
+</section>
+<section id="heading1-1" class="title-slide slide level2">
+<h2><span><span class="en">Decision Trees</span> <span class="sk">Rozhodovacie stromy</span></span></h2>
+<div class="columns">
+<div class="column spread025" style="width:70%;">
+<div class="space-after">
+<ul>
+<li id="section">
+<span class="en">What if we want to base decisions on combinations of attributes?</span> <span class="sk">Čo ak chceme rozhodnutia zakladať na kombináciách atribútov?</span>
+</li>
+<li id="section">
+<span class="en">A decision tree:</span> <span class="sk">Rozhodovací strom:</span>
+<ul>
+<li id="section">
+<span class="en">Nodes are decision criteria;</span> <span class="sk">Uzly sú rozhodovacie kritériá;</span>
+</li>
+<li id="section">
+<span class="en">Branches are the alternatives;</span> <span class="sk">Vetvy sú alternatívy;</span>
+</li>
+<li id="section">
+<span class="en">Leaves represent decisions.</span> <span class="sk">Listy predstavujú rozhodnutia.</span>
+</li>
+</ul>
+</li>
+<li id="section">
+<span class="en">Example: should we get an ice cream?</span> <span class="sk">Príklad: dáme si zmrzlinu?</span>
+</li>
+</ul>
+</div>
+<ul>
+<li id="section" data-onslide="2-">
+<span class="en">How do we <strong>construct</strong> a tree, given <strong>data</strong>?</span> <span class="sk">Ako na základe <strong>dát zostrojíme</strong> strom?</span>
+</li>
+</ul>
+<div data-only="2-">
+<div class="en">
+<table>
+<thead>
+<tr class="header">
+<th><strong># obs.</strong></th>
+<th><strong>cone quality</strong></th>
+<th><strong>ice cream quality</strong></th>
+<th><strong>have one?</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>great</td>
+<td>great</td>
+<td>yes</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>great</td>
+<td>poor</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>good</td>
+<td>poor</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\vdots\)</span></td>
+<td><span class="math inline">\(\vdots\)</span></td>
+<td><span class="math inline">\(\vdots\)</span></td>
+<td><span class="math inline">\(\vdots\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sk">
+<table>
+<thead>
+<tr class="header">
+<th><strong># vzorky</strong></th>
+<th><strong>kvalita kornúta</strong></th>
+<th><strong>kvalita zmrzliny</strong></th>
+<th><strong>dať si?</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>výborná</td>
+<td>výborná</td>
+<td>áno</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>výborná</td>
+<td>zlá</td>
+<td>nie</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>dobrá</td>
+<td>zlá</td>
+<td>nie</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\vdots\)</span></td>
+<td><span class="math inline">\(\vdots\)</span></td>
+<td><span class="math inline">\(\vdots\)</span></td>
+<td><span class="math inline">\(\vdots\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div><div class="column space-before15" style="width:30%;">
+<p><img data-src="images/dtree/dtree_zmrzlina_1.svg" style="width:100.0%" /></p>
+</div>
+</div>
+</section>
+
+<section id="forming-branches-vytvorenie-vetiev" class="title-slide slide level2">
+<h2><span class="en">Forming Branches</span> <span class="sk">Vytvorenie vetiev</span></h2>
+<p><span class="subtitle"><span><span class="en">Decision Trees</span> <span class="sk">Rozhodovacie stromy</span></span></span></p>
+<div class="columns">
+<div class="column" style="width:70%;">
+<ul>
+<li id="section">
+<span class="en">Let’s say that we know which attribute we are going to be branching on.</span> <span class="sk">Povedzme, že vieme podľa ktorého atribútu chceme robiť vetvenie.</span>
+</li>
+<li id="section">
+<span class="en">How do we form the branches?</span> <span class="sk">Ako vytvoríme vetvy?</span>
+</li>
+<li id="section" class="space-before1" data-onslide="2-">
+<span class="en">Let’s list the alternatives:</span> <span class="sk">Pozrime sa na alternatívy:</span>
+<ul>
+<li id="section" data-onslide="2-">
+<span class="en">Samples with <strong>great</strong> ice cream quality.</span> <span class="sk">Vzorky s <strong>výbornou</strong> kvalitou zmrzliny.</span>
+</li>
+</ul>
+<div data-onslide="2-">
+<div class="en">
+<table>
+<thead>
+<tr class="header">
+<th><strong># obs.</strong></th>
+<th><strong>cone quality</strong></th>
+<th><strong>have one?</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>great</td>
+<td>yes</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>great</td>
+<td>yes</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>poor</td>
+<td>yes</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>good</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sk">
+<table>
+<thead>
+<tr class="header">
+<th><strong># vzorky</strong></th>
+<th><strong>kvalita kornúta</strong></th>
+<th><strong>dať si?</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>výborná</td>
+<td>áno</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>výborná</td>
+<td>áno</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>zlá</td>
+<td>áno</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>dobrá</td>
+<td>áno</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<ul>
+<li id="section" data-onslide="3-">
+<span class="en">If a certain majority of samples correspond to one class, we can settle on it.</span> <span class="sk">Ak dostatočná väčšina vzoriek zodpovedá jednej triede, môžeme sa rozhodnúť pre ňu.</span>
+</li>
+<li id="section" data-onslide="4-">
+<span class="en">Similarly for <strong>poor</strong>, the class will be clear.</span> <span class="sk">Trieda bude zrejmá aj pre hodnotu <strong>zlá</strong>.</span>
+</li>
+<li id="section" data-onslide="5-">
+<span class="en">For <strong>good</strong> the classes will be intermixed and we will need another branching.</span> <span class="sk">Pre hodnotu <strong>dobrá</strong> budú triedy zmiešané a budeme potrebovať ďalšie vetvenie.</span>
+</li>
+</ul>
+</li>
+</ul>
+</div><div class="column space-before15" style="width:30%;">
+<p><img data-src="images/dtree/dtree_make_leaf.svg" data-only="2-3" style="width:100.0%" /> <img data-src="images/dtree/dtree_make_leaf_2.svg" data-only="4" style="width:100.0%" /> <img data-src="images/dtree/dtree_make_leaf_3.svg" data-only="5" style="width:100.0%" /> <img data-src="images/dtree/dtree_make_leaf_4.svg" data-only="6" style="width:100.0%" /></p>
+</div>
+</div>
+</section>
+
+<section id="noise-in-the-data-šum-v-dátach" class="title-slide slide level2">
+<h2><span class="en">Noise in the Data</span> <span class="sk">Šum v dátach</span></h2>
+<p><span class="subtitle"><span><span class="en">Decision Trees</span> <span class="sk">Rozhodovacie stromy</span></span></span></p>
+<div class="space-before1">
+<ul>
+<li id="section">
+<span class="en">The classes are sometimes still intermixed in some branches even though we have used up all the attributes.</span> <span class="sk">Môže sa stať, že triedy sú v niektorých vetvách stále zmiešané, hoci sme už použili všetky atribúty.</span>
+</li>
+<li id="section">
+<span class="en">There are two reasons for this…</span> <span class="sk">Existujú na to dva dôvody…</span>
+</li>
+</ul>
+</div>
+<div data-onslide="2-">
+<p><span class="block en">Missing Attributes</span> <span class="block sk">Chýbajúce atribúty</span></p>
+<ul>
+<li id="section">
+<span class="en">Some crucial attributes may be missing in our data.</span> <span class="sk">Niektoré kľúčové atribúty môžu v našich dátach chýbať.</span>
+</li>
+<li id="section">
+<span class="en">In the case of ice cream e.g.:</span> <span class="sk">V prípade zmrzliny napr.:</span>
+<ul>
+<li id="section">
+<span class="en">the season of the year: fewer people eat ice cream in the winter;</span> <span class="sk">ročné obdobie: cez zimu je zmrzlinu menej ľudí;</span>
+</li>
+<li id="section">
+<span class="en">current weather; …</span> <span class="sk">aktuálne počasie; …</span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div data-onslide="3-">
+<p><span class="block en">Noise in the Data</span> <span class="block sk">Šum v dátach</span></p>
+<ul>
+<li id="section">
+<span class="en">There is noise in the data.</span> <span class="sk">V dátach je šum.</span>
+</li>
+<li id="section">
+<span class="en">The noise can sometimes also be a result of missing attributes – but such that we do not want to include on principle.</span> <span class="sk">Šum môže niekedy byť aj dôsledkom ďalších chýbajúcich atribútov – lenže takých, ktoré nechceme zahrnúť z princípu.</span>
+</li>
+<li id="section">
+<span class="en">E.g. the person may just have had 3 waffles and their appetite for sweetmeats is well sated.</span> <span class="sk">Napr. daná osoba práve zjedla 3 wafle a jej apetít na sladké je dôkladne zasýtený.</span>
+</li>
+</ul>
+</div>
+</section>
+
+<section id="which-attribute-to-branch-on-cez-ktorý-atribút-vetviť" class="title-slide slide level2">
+<h2><span class="en">Which Attribute to Branch On?</span> <span class="sk">Cez ktorý atribút vetviť?</span></h2>
+<p><span class="subtitle"><span><span class="en">Decision Trees</span> <span class="sk">Rozhodovacie stromy</span></span></span></p>
+<ul>
+<li id="section">
+<span class="en">But how do we choose which attribute to branch on?</span> <span class="sk">Ako však vyberieme podľa ktorého atribútu vetviť?</span>
+</li>
+<li id="section" data-only="1-2">
+<span class="en">Order matters:</span> <span class="sk">Na poradí záleží:</span>
+</li>
+</ul>
+<div class="columns space-before1" data-only="1-2">
+<div class="column centering" style="width:50%;">
+<p><img data-src="images/dtree/dtree_zmrzlina_1.svg" style="width:44.0%" /></p>
+</div><div class="column centering" style="width:50%;">
+<p><img data-src="images/dtree/dtree_zmrzlina_2.svg" style="width:100.0%" /></p>
+</div>
+</div>
+<ul>
+<li id="section" class="space-before15" data-only="2">
+<span class="en">Ideally, we should try out all possible trees and pick the best one.</span> <span class="sk">Ideálne by sme mali vyskúšať všetky možné stromy a vybrať najlepší.</span>
+<ul>
+<li id="section" data-only="2">
+<span class="en">But that is not computationally feasible.</span> <span class="sk">Lenže to nie je výpočtovo prípustné.</span>
+</li>
+</ul>
+</li>
+<li id="section" data-only="3-">
+<span class="en">We make the decisions greedily on a layer-by-layer basis.</span> <span class="sk">Rozhodnutia robíme lačným spôsobom vrstvu po vrstve.</span>
+<ul>
+<li id="section" data-only="3-">
+<span class="en">We pick the attribute which most cleanly separates the classes;</span> <span class="sk">Vyberieme atribút, ktorý triedy oddelí najčistejšie;</span>
+</li>
+<li id="section" data-only="3-">
+<span class="en">Measures: <strong>information gain</strong>, <strong>Gini index</strong>, …</span> <span class="sk">Ukazovatele: <strong>informačný zisk</strong>, <strong>Gini index</strong>, …</span>
+</li>
+</ul>
+</li>
+</ul>
+<div class="columns space-before05" data-only="3-">
+<div class="column" style="width:50%;">
+<p><img data-src="images/dtree/dtree_data_part1.svg" style="width:85.0%" /></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="images/dtree/dtree_data_part2.svg" style="width:91.0%" /></p>
+</div>
+</div>
+</section>
+
+<section id="decision-trees-are-shallow-rozhodovacie-stromy-sú-plytké" class="title-slide slide level2">
+<h2><span class="en">Decision Trees Are Shallow</span> <span class="sk">Rozhodovacie stromy sú plytké</span></h2>
+<p><span class="subtitle"><span><span class="en">Decision Trees</span> <span class="sk">Rozhodovacie stromy</span></span></span></p>
+<ul>
+<li id="section">
+<span class="en">Decision trees are <strong>shallow</strong>.</span> <span class="sk">Rozhodovacie stromy sú <strong>plytké</strong>.</span>
+</li>
+<li id="section">
+<span class="en">They cannot learn to preprocess their own data.</span> <span class="sk">Nevedia sa naučiť predspracovať vlastné dáta.</span>
+</li>
+<li id="section">
+<span class="en">They merely divide the input space into rectangular regions.</span> <span class="sk">Len delia vstupný priestor na obdĺžnikové oblasti.</span>
+</li>
+</ul>
+<p><img data-src="images/dtree/dtree_data_decision.svg" style="width:50.0%" /></p>
+</section>
+
+<section id="size-of-the-tree-veľkosť-stromu" class="title-slide slide level2">
+<h2><span class="en">Size of the Tree</span> <span class="sk">Veľkosť stromu</span></h2>
+<p><span class="subtitle"><span><span class="en">Decision Trees</span> <span class="sk">Rozhodovacie stromy</span></span></span></p>
+<ul>
+<li id="section">
+<span class="en">Decision trees tend to be interpretable.</span> <span class="sk">Rozhodovacie stromy zvyknú byť interpretovateľné.</span>
+</li>
+<li id="section" data-only="2-">
+<span class="en">Provided that they are not too large.</span> <span class="sk">Ak nie sú príliš rozsiahle.</span>
+</li>
+</ul>
+<p><img data-src="images/dtree/dtree_titanic_pruned.svg" data-only="1" style="width:100.0%" /> <img data-src="images/dtree/dtree_titanic_nonpruned.png" class="space-after" data-only="2-" style="width:100.0%" /></p>
+<ul>
+<li id="section" data-onslide="3-">
+<span class="en">Overly large trees tend to <strong>overfit</strong>: they <strong>will not generalize</strong>.</span> <span class="sk">Priveľké stromy sa zvyknú aj <strong>preučiť</strong>: <strong>nebudú zovšeobecňovať</strong>.</span>
+</li>
+<li id="section" data-onslide="3-">
+<span class="en">How do we limit the size?</span> <span class="sk">Ako obmedziť veľkosť?</span>
+</li>
+</ul>
+</section>
+
+<section id="pruning-prerezávanie" class="title-slide slide level2">
+<h2><span class="en">Pruning</span> <span class="sk">Prerezávanie</span></h2>
+<p><span class="subtitle"><span><span class="en">Decision Trees</span> <span class="sk">Rozhodovacie stromy</span></span></span></p>
+<ul>
+<li id="section" class="space-before">
+<span class="en">How to limit the size of the tree? <strong>Pruning!</strong></span> <span class="sk">Ako obmedziť veľkosť stromu? <strong>Prerezávanie!</strong></span>
+</li>
+</ul>
+<div class="space-before1">
+<p><span class="block en">Pre-pruning</span> <span class="block sk">Dopredné prerezávanie (pre-pruning)</span></p>
+<ul>
+<li id="section">
+<span class="en">Done while growing the tree.</span> <span class="sk">Robí sa počas rastu stromu.</span>
+</li>
+<li id="section">
+<span class="en">Branching is only allowed if some criteria are met.</span> <span class="sk">Vetvenie je povolené len ak sa splnia isté kritériá.</span>
+</li>
+<li id="section">
+<span class="en">E.g. there are at least <span class="math inline">\(N\)</span> matching samples.</span> <span class="sk">Napr. existuje aspoň <span class="math inline">\(N\)</span> zodpovedajúcich vzoriek.</span>
+<ul>
+<li id="section">
+<span class="en">It’s usually a bad idea to base a branching point on just 2 or 3 samples.</span> <span class="sk">Väčšinou nie je dobrý nápad založiť vetvenie len na 2 alebo 3 vzorkách.</span>
+</li>
+<li id="section">
+…
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="space-before1" data-onslide="2-">
+<p><span class="block en">Post-pruning</span> <span class="block sk">Spätné prerezávanie</span></p>
+<ul>
+<li id="section">
+<span class="en">Grow a full tree.</span> <span class="sk">Vytvorí sa úplný strom.</span>
+</li>
+<li id="section">
+<span class="en">Then try removing parts of it.</span> <span class="sk">Potom sa časti z neho odstraňujú.</span>
+</li>
+<li id="section">
+<span class="en">If the removal degrades performance too much, go back.</span> <span class="sk">Ak odstránenie podstatne zhorší výsledky, daná časť sa vráti späť.</span>
+</li>
+<li id="section">
+…
+</li>
+</ul>
+</div>
+</section>
+</section>
+<section>
+<section id="attribute-selection-classification-výber-atribútu-klasifikácia" class="title-slide slide level1 empty">
+<h1 class="empty"><span class="en">Attribute Selection: Classification</span> <span class="sk">Výber atribútu: klasifikácia</span></h1>
+<div class="columns">
+<div class="column" style="width:12%;">
+
+</div><div class="column spread075" style="width:76%;">
+<ul>
+<li id="section">
+<span class="en">We have already mentioned the two commonly used measures for attribute selection:</span> <span class="sk">Dve miery často používané na výber atribútu sme už spomenuli:</span>
+<ul>
+<li id="section">
+<span class="en">Information gain;</span> <span class="sk">Informačný zisk;</span>
+</li>
+<li id="section">
+<span class="en">Gini index;</span> <span class="sk">Gini index;</span>
+</li>
+</ul>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en">We are now going to show the math behind them;</span> <span class="sk">Teraz sa pozrieme na súvisiacu matematiku;</span>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en">We’ll start by revising a few concepts from information theory;</span> <span class="sk">Začneme opakovaním pár konceptov z teórie informácií;</span>
+</li>
+</ul>
+</div><div class="column" style="width:12%;">
+
+</div>
+</div>
+</section>
+<section id="an-aside-the-expected-value-poznámka-očakávaná-hodnota" class="title-slide slide level2">
+<h2><span class="en">An Aside: The Expected Value</span> <span class="sk">Poznámka: očakávaná hodnota</span></h2>
+<p><span class="subtitle"><span><span class="en">Attribute Selection: Classification</span> <span class="sk">Výber atribútu: klasifikácia</span></span></span></p>
+<div class="columns space-before1">
+<div class="column spread1" style="width:60%;">
+<ul>
+<li id="section">
+<span class="en">When working with a stochastic variable <span class="math inline">\(X\)</span>, there is a lot of possible outcomes;</span> <span class="sk">Keď pracujeme so stochastickou premennou <span class="math inline">\(X\)</span>, môžeme získať mnoho rôznych hodnôt;</span>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en">The expected value (mean) is used as a way to summarize all that information;</span> <span class="sk">Očakávaná (stredná) hodnota sa používa na sumarizáciu všetkých týchto informácií;</span>
+<p><span class="math display">\[
+E[X] = \sum_{x_i} p(x_i) \cdot x_i,
+\]</span></p>
+<ul>
+<li id="section">
+<span class="en">Basically a generalization of the arithmetic mean;</span> <span class="sk">V podstate zovšeobecnenie aritmetického priemeru;</span>
+</li>
+<li id="section">
+<span class="en">We are summing up all the possible values <span class="math inline">\(x_i\)</span>;</span> <span class="sk">Spočítavame všetky možné hodnoty <span class="math inline">\(x_i\)</span>;</span>
+</li>
+<li id="section">
+<span class="en">Weighting them by their probabilities <span class="math inline">\(p(x_i)\)</span>;</span> <span class="sk">Váhujeme príslušnými pravdepodobnosťami <span class="math inline">\(p(x_i)\)</span>;</span>
+</li>
+</ul>
+</li>
+</ul>
+<div data-onslide="3-">
+<p><span class="en block">An Example</span> <span class="sk block">Príklad</span></p>
+<ul>
+<li id="section">
+<span class="en">Random variable <span class="math inline">\(X\)</span> with three possible values;</span> <span class="sk">Náhodná premenná <span class="math inline">\(X\)</span>: tri možné hodnoty;</span>
+</li>
+<li id="section">
+<span class="en">What is the expected value <span class="math inline">\(\mathbb{E}[X]\)</span>?</span> <span class="sk">Aká je očakávaná hodnota <span class="math inline">\(\mathbb{E}[X]\)</span>?</span>
+</li>
+</ul>
+<div data-onslide="4-">
+<p><span class="math display">\[
+E[X] = p(2) \cdot 2 + p(8) \cdot 8 - p(-4) \cdot 4
+\]</span></p>
+</div>
+<div data-onslide="5-">
+<p><span class="math display">\[
+\color{green} E[X] = 0.3 \cdot 2 + 0.1 \cdot 8 - 0.6 \cdot 4 = -1
+\]</span></p>
+</div>
+</div>
+</div><div class="column" style="width:40%;">
+<p><img data-src="images/intro/expected_value.svg" style="width:100.0%" /></p>
+<table data-onslide="3-">
+<tr>
+<td>
+<strong>probability</strong>
+</td>
+<td>
+<strong>value</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align: center">
+0.3
+</td>
+<td style="text-align: center">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align: center">
+0.1
+</td>
+<td style="text-align: center">
+8
+</td>
+</tr>
+<tr>
+<td style="text-align: center">
+0.6
+</td>
+<td style="text-align: center">
+-4
+</td>
+</tr>
+</table>
+</div>
+</div>
+</section>
+
+<section id="information-content-množstvo-informácie" class="title-slide slide level2">
+<h2><span class="en">Information Content</span> <span class="sk">Množstvo informácie</span></h2>
+<p><span class="subtitle"><span><span class="en">Attribute Selection: Classification</span> <span class="sk">Výber atribútu: klasifikácia</span></span></span></p>
+<div class="columns space-before15">
+<div class="column spread075" style="width:50%;">
+<ul>
+<li id="section">
+<span class="en"><strong>Information content:</strong> a measure of how informational an event is;</span> <span class="sk"><strong>Množstvo informácie:</strong> miera toho, aká informatívna je udalosť;</span>
+<div class="space-before05 spread05" data-onslide="2-">
+<ul>
+<li id="section">
+<span class="en">The <strong>less probable</strong> an event is, the <strong>more information</strong> it carries;</span> <span class="sk">Čím <strong>menej pravdepodobná</strong> je udalosť, <strong>tým viac informácie</strong> nesie;</span>
+</li>
+<li id="section">
+<span class="en">An event with <strong>probability 1 carries no information</strong> – its occurrence is totally unsurprising;</span> <span class="sk">Udalosť s <strong>pravdepodobnosťou 1 nenesie žiadnu informáciu</strong> – jej výskyt nie je vôbec prekvapivý;</span>
+</li>
+</ul>
+</div>
+<div class="space-before15" data-onslide="2-">
+<p><span class="math display">\[
+I(A) \equiv - \log_b[P(A)]
+\]</span></p>
+</div>
+</li>
+</ul>
+</div><div class="column spread1" style="width:50%;">
+<ul>
+<li id="section" data-onslide="3-">
+<span class="en">The log is so that the <span class="math inline">\(IC\)</span> of two independent events <span class="math inline">\(A, B\)</span> is additive:</span> <span class="sk">Používame log, aby <span class="math inline">\(IC\)</span> dvoch nezávislých udalostí <span class="math inline">\(A, B\)</span> bolo aditívne:</span>
+<p><span class="math display">\[
+I(A \cap B) = I(A) + I(B)
+\]</span></p>
+<ul>
+<li id="section">
+<span class="en">You can derive that from</span> <span class="sk">Dá sa to odvodiť z</span> <span class="math inline">\(P(A \cap B) = P(A) \cdot P(B)\)</span>;
+</li>
+</ul>
+</li>
+<li id="section" data-onslide="4-">
+<span class="en">The base of the log determines units:</span> <span class="sk">Základ logaritmu určuje jednotky:</span>
+<ul>
+<li id="section">
+<span class="math inline">\(b=2\)</span>: <span class="en">bit (also shannon);</span> <span class="sk">bit (resp. shannon);</span>
+</li>
+<li id="nat">
+<span class="math inline">\(b=e\)</span>: nat;
+</li>
+<li id="hartley">
+<span class="math inline">\(b=10\)</span>: hartley;
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="columns space-before1">
+<div class="column spread05" data-onslide="5-" style="width:50%;">
+<p><span class="block en">Example</span> <span class="block sk">Príklad</span></p>
+<ul>
+<li id="section">
+<span class="en">Let</span> <span class="sk">Nech</span> <span class="math inline">\(P(A) = 0.5\)</span>;
+</li>
+<li id="section">
+<span class="en">Compute <span class="math inline">\(I(A)\)</span> in bits;</span> <span class="sk">Vypočítajte <span class="math inline">\(I(A)\)</span> v bitoch;</span>
+</li>
+</ul>
+</div><div class="column spread05" data-onslide="6-" style="width:50%;">
+<p><span class="block en">Solution</span> <span class="block sk">Riešenie</span></p>
+<ul>
+<li id="section">
+<span class="math inline">\(I(A) = - \log_2 P(A)\)</span>;
+</li>
+<li id="section">
+<span class="math inline">\(\color{green} I(A) = - \log_2 0.5 = 1 \text{ bit}\)</span>
+</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section id="entropy-entropia" class="title-slide slide level2">
+<h2><span class="en">Entropy</span> <span class="sk">Entropia</span></h2>
+<p><span class="subtitle"><span><span class="en">Attribute Selection: Classification</span> <span class="sk">Výber atribútu: klasifikácia</span></span></span></p>
+<ul>
+<li id="section">
+<span class="en"><strong>Entropy</strong> of a random variable is the <strong>expected value of information content</strong>;</span> <span class="sk"><strong>Entropia</strong> náhodnej premennej je <strong>očakávaná hodnota jej množstva informácie</strong>;</span>
+<div data-onslide="2-">
+<p><span class="math display">\[
+H(X) = \mathbb{E}[I(X)] = - \sum_{x_i} P(x_i) \cdot \log_b P(x_i)
+\]</span></p>
+<ul>
+<li id="section">
+<span class="en">Entropy is a measure of the variable’s <strong>stochasticity</strong>;</span> <span class="sk">Entropia je miera <strong>stochasticity</strong> premennej;</span>
+</li>
+<li id="section">
+<span class="en">When <span class="math inline">\(H(X) = 0\)</span>, the variable is <strong>deterministic</strong>;</span> <span class="sk">Keď <span class="math inline">\(H(X) = 0\)</span>, premenná je <strong>deterministická</strong>;</span>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<div class="columns">
+<div class="column" data-onslide="3-" style="width:50%;">
+<p><span class="block en">Example</span> <span class="block sk">Príklad</span></p>
+<ul>
+<li id="section">
+<span class="en">Let these be the possible values of random variable <span class="math inline">\(X\)</span> and their probabilities;</span> <span class="sk">Nech toto sú možné hodnoty náhodnej premennej <span class="math inline">\(X\)</span> a ich pravdepodobnosti;</span>
+</li>
+</ul>
+<table>
+<tr>
+<td>
+<strong>probability</strong>
+</td>
+<td>
+<strong>value</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align: center">
+0.3
+</td>
+<td style="text-align: center">
+<span class="math inline">\(x_1 = 2\)</span>
+</td>
+</tr>
+<tr>
+<td style="text-align: center">
+0.1
+</td>
+<td style="text-align: center">
+<span class="math inline">\(x_2 = 8\)</span>
+</td>
+</tr>
+<tr>
+<td style="text-align: center">
+0.6
+</td>
+<td style="text-align: center">
+<span class="math inline">\(x_3 = -4\)</span>
+</td>
+</tr>
+</table>
+<ul>
+<li id="section">
+<span class="en"><strong>Compute entropy <span class="math inline">\(H(X)\)</span> in bits!</strong></span> <span class="sk"><strong>Vypočítajte entropiu <span class="math inline">\(H(X)\)</span> v bitoch!</strong></span>
+</li>
+</ul>
+</div><div class="column" data-onslide="4-" style="width:50%;">
+<p><span class="block en">Solution</span> <span class="block sk">Riešenie</span></p>
+<div class="space-before1">
+<p><span class="math display">\[
+\begin{aligned}
+H(X) = &amp;- P(x_1) \cdot \log_2 P(x_1) \\
+&amp;- P(x_2) \cdot \log_2 P(x_2) \\
+&amp;- P(x_3) \cdot \log_2 P(x_3) \\
+\end{aligned}
+\]</span></p>
+</div>
+<div class="space-before1" data-onslide="5-">
+<p><span class="math display">\[
+\begin{aligned}
+H(X) = &amp;- 0.3 \cdot \log_2 0.3 \\
+&amp;- 0.1 \cdot \log_2 0.1 \\
+&amp;- 0.6 \cdot \log_2 0.6 \\
+\end{aligned}
+\]</span></p>
+</div>
+<div class="space-before1" data-onslide="6-">
+<p><span class="math display">\[
+\color{green}
+H(X) \approx 1.295
+\]</span></p>
+</div>
+</div>
+</div>
+</section>
+
+<section id="conditional-entropy-podmienená-entropia" class="title-slide slide level2">
+<h2><span class="en">Conditional Entropy</span> <span class="sk">Podmienená entropia</span></h2>
+<p><span class="subtitle"><span><span class="en">Attribute Selection: Classification</span> <span class="sk">Výber atribútu: klasifikácia</span></span></span></p>
+<div class="columns space-before05">
+<div class="column" style="width:40%;">
+<ul>
+<li id="section">
+<span class="en">How to compute how much entropy is left when we split on an attribute?</span> <span class="sk">Ako vypočítať, koľko entropie zostane po rozdelení podľa atribútu?</span>
+<div class="space-before05 spread05">
+<ul>
+<li id="section">
+<span class="en">Compute entropy for each part;</span> <span class="sk">Vypočítame entropiu pre každú časť;</span>
+</li>
+<li id="section">
+<span class="en">Add them up;</span> <span class="sk">Spočítame ich;</span>
+</li>
+<li id="section">
+<span class="en">Weight each by the portion of points it contains</span> <span class="sk">Každú váhujeme podielom bodov, ktoré obsahuje;</span>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div><div class="column" style="width:30%;">
+<p><img data-src="images/dtree/dtree_data_part1.svg" style="width:90.0%" /></p>
+</div><div class="column" style="width:30%;">
+<p><img data-src="images/dtree/dtree_data_part2.svg" style="width:100.0%" /></p>
+</div>
+</div>
+<div class="columns" data-onslide="2-">
+<div class="column vcentering" style="width:80%;">
+<p><span class="math display">\[
+\begin{aligned}
+H(C|A_k) &amp;= \sum_{a_{k,j}} P(a_{k,j}) \cdot H(C | a_{k,j}) \\
+H(C | a_{k,j}) &amp;= -\sum_{c_i} p(c_i | a_{k,j} ) \cdot \log_b p(c_i | a_{k,j} )
+\end{aligned}
+\]</span></p>
+</div><div class="column vcentering" style="width:20%;">
+<p><span class="citation" data-cites="Spalek2005">[6]</span></p>
+</div>
+</div>
+<div class="spread025" data-onslide="2-">
+<ul>
+<li id="section">
+<span class="en"><span class="math inline">\(C\)</span>: the output (whether to have ice cream);</span> <span class="sk"><span class="math inline">\(C\)</span>: výstup (či si dať zmrzlinu);</span>
+</li>
+<li id="section">
+<span class="en"><span class="math inline">\(A_k\)</span>: input attribute <span class="math inline">\(k\)</span> (e.g. “cone quality”);</span> <span class="sk"><span class="math inline">\(A_k\)</span>: vstupný atribút <span class="math inline">\(k\)</span> (napr. “cone quality”;)</span>
+</li>
+<li id="section">
+<span class="en"><span class="math inline">\(a_{k,j}\)</span>: <span class="math inline">\(j\)</span>-th value of attribute <span class="math inline">\(A_k\)</span> (e.g. “poor”);</span> <span class="sk"><span class="math inline">\(a_{k,j}\)</span>: <span class="math inline">\(j\)</span>-ta hodnota atribútu <span class="math inline">\(A_k\)</span> (napr. “poor”);</span>
+</li>
+</ul>
+</div>
+</section>
+
+<section id="information-gain-informačný-zisk" class="title-slide slide level2 optional">
+<h2 class="optional"><span class="en">Information Gain</span> <span class="sk">Informačný zisk</span></h2>
+<p><span class="subtitle"><span><span class="en">Attribute Selection: Classification</span> <span class="sk">Výber atribútu: klasifikácia</span></span></span></p>
+<div class="spread15 space-before1">
+<ul>
+<li id="section">
+<span class="en">We are looking at:</span> <span class="sk">Sledujeme:</span>
+<ul>
+<li id="section">
+<span class="en">How much information we gained about our output <span class="math inline">\(C\)</span>;</span> <span class="sk">Koľko informácie sme získali o výstupe <span class="math inline">\(C\)</span>;</span>
+</li>
+<li id="section">
+<span class="en">After splitting by attribute <span class="math inline">\(A_k\)</span>;</span> <span class="sk">Po rozdelení podľa atribútu <span class="math inline">\(A_k\)</span>;</span>
+</li>
+</ul>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en"><strong>Information gain:</strong></span> <span class="sk"><strong>Informačný zisk:</strong></span> <span class="citation" data-cites="Spalek2005 ISLRv2">[4,6]</span>:
+<ul>
+<li id="section">
+<span class="en">The difference in entropy before and after the split</span> <span class="sk">Rozdiel medzi entropiou pred a po rozdelení</span>
+</li>
+</ul>
+<p><span class="math display">\[
+I_G(C, A_k) = H(C) - H(C|A_k)
+\]</span></p>
+<ul>
+<li id="section">
+<span class="en">I.e. how much our entropy decreased;</span> <span class="sk">T.j. o koľko sa entropia znížila;</span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="space-before15" data-onslide="3-">
+<p><span class="en block">Using Conditional Entropy Directly</span> <span class="sk block">Použiť priamo podmienenú entropiu</span></p>
+<ul>
+<li id="section">
+<span class="en"><span class="math inline">\(H(C)\)</span> does not depend on the attribute;</span> <span class="sk"><span class="math inline">\(H(C)\)</span> nezávisí od atribútu;</span>
+<div class="spread05 space-before05">
+<ul>
+<li id="section">
+<span class="en">We can just compute conditional entropy <span class="math inline">\(H(C|A_k)\)</span> for each attribute;</span> <span class="sk">Stačí vypočítať pre každý atribút podmienenú entropiu <span class="math inline">\(H(C|A_k)\)</span>;</span>
+</li>
+<li id="section">
+<span class="en">Pick the attribute with minimum entropy;</span> <span class="sk">Zvoliť atribút s minimálnou entropiou;</span>
+</li>
+<li id="section">
+<span class="en">Saves unnecessary work;</span> <span class="sk">Ušetrí zbytočné výpočty;</span>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</section>
+
+<section id="gini-index" class="title-slide slide level2">
+<h2>Gini Index</h2>
+<p><span class="subtitle"><span><span class="en">Attribute Selection: Classification</span> <span class="sk">Výber atribútu: klasifikácia</span></span></span></p>
+<div class="space-before15 spread15">
+<ul>
+<li id="section">
+<span class="en">Gini index is another popular criterion for branching attribute selection</span> <span class="sk">Gini index je ďalšie obľúbené kritérium pre výber atribútu na vetvenie</span> <span class="citation" data-cites="ISLRv2">[4]</span>:
+<p><span class="math display">\[
+Gini(X) = \sum_{x_i} P(x_i) (1 - P(x_i))
+\]</span></p>
+</li>
+<li id="section">
+<span class="en">Note how this also approaches 0 when <span class="math inline">\(P(x_i)\)</span>:</span> <span class="sk">Všimnite si, že sa tiež blíži 0 keď <span class="math inline">\(P(x_i)\)</span>:</span>
+<ul>
+<li id="section">
+<span class="en">Is close to 0;</span> <span class="sk">Je blízko 0;</span>
+</li>
+<li id="section">
+<span class="en">Is close to 1;</span> <span class="sk">Je blízko 1;</span>
+</li>
+</ul>
+</li>
+<li id="section">
+<span class="en">Machine learning libraries often <strong>use it by default</strong>;</span> <span class="sk">V knižniciach na strojové učenie ju často <strong>predvolené</strong>;</span>
+<ul>
+<li id="section">
+<span class="en">There is no log: i.e. it is <strong>a bit faster</strong>;</span> <span class="sk">Neobsahuje log: t.j. je <strong>o trochu rýchlejšie</strong>;</span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+<section>
+<section id="decision-trees-on-numeric-data-rozhodovacie-stromy-na-numerických-dátach" class="title-slide slide level1 empty">
+<h1 class="empty"><span class="en">Decision Trees on Numeric Data</span> <span class="sk">Rozhodovacie stromy na numerických dátach</span></h1>
+
+</section>
+<section id="numeric-inputs-numerické-vstupy" class="title-slide slide level2">
+<h2><span class="en">Numeric Inputs</span> <span class="sk">Numerické vstupy</span></h2>
+<p><span class="subtitle"><span><span class="en">Decision Trees on Numeric Data</span> <span class="sk">Rozhodovacie stromy na numerických dátach</span></span></span></p>
+<div class="columns">
+<div class="column spread05" style="width:60%;">
+<ul>
+<li id="section">
+<span class="en">But how do we deal with numeric attributes?</span> <span class="sk">Ale čo s numerickými atribútmi?</span>
+<ul>
+<li id="section">
+<span class="en">There are <strong>infinitely many values</strong>!</span> <span class="sk">Majú <strong>nekonečný počet hodnôt</strong>!</span>
+</li>
+</ul>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en">We usually build binary trees;</span> <span class="sk">Väčšinou tvoríme binárne stromy;</span>
+<ul>
+<li id="section">
+<span class="en">I.e. we only need <strong>a split point</strong>;</span> <span class="sk">T.j. potrebujeme len <strong>bod delenia</strong>;</span>
+</li>
+</ul>
+</li>
+<li id="section" data-onslide="3-">
+<span class="en">There is actually not infinitely many candidates!</span> <span class="sk">V skutočnosti nemáme nekonečno kandidátov!</span>
+<ul>
+<li id="section">
+<span class="en">Split points only make sense in between data points;</span> <span class="sk">Body delenia má zmysel klásť len medzi dátové body;</span>
+</li>
+<li id="section">
+<span class="en">Walk through them and check which one works best;</span> <span class="sk">Prejdeme všetky a zistíme, ktorý je najlepší;</span>
+</li>
+<li id="section">
+<span class="en">Information gain, Gini, variance, …</span> <span class="sk">Informačný zisk, Gini, rozptyl, …</span>
+</li>
+</ul>
+</li>
+<li id="section" data-onslide="4-">
+<span class="en">This may be too many candidates;</span> <span class="sk">Stále to môže byť priveľa kandidátov;</span>
+<ul>
+<li id="section" data-onslide="5-">
+<span class="en">So we just put them at some specific quantiles;</span> <span class="sk">Tak ich vyberieme len niektoré kvantily;</span>
+</li>
+</ul>
+</li>
+</ul>
+<div data-onslide="6-">
+<p><span class="block en">Binary vs. Multiway Splits</span> <span class="block sk">Binárne vs. viaccestné vetvenie</span></p>
+<ul>
+<li id="section">
+<span class="en">It is usually better to use binary splits in any case;</span> <span class="sk">Väčšinou je tak či tak lepšie binárne delenie;</span>
+<div class="space-before05 spread05">
+<ul>
+<li id="section">
+<span class="en">Multiway splits can contribute to overfitting on smaller datasets</span> <span class="sk">Viaccestné môže na menších množinách prispieť ku preučeniu;</span> <span class="citation" data-cites="antipov2010applying">[1]</span>;
+</li>
+<li id="section">
+<span class="en">The data is very quickly split into very small groups;</span> <span class="sk">Dáta sa veľmi rýchlo rozdelia do veľmi malých skupín;</span>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div><div class="column" style="width:40%;">
+<p><img data-src="images/dtree/dtree_titanic_pruned_part.svg" data-onslide="2-" style="width:70.0%" /></p>
+<div class="space-before1">
+<p><img data-src="images/dtree/split_candidates_10_all.svg" data-only="3" style="width:100.0%" /></p>
+<p><img data-src="images/dtree/split_candidates_50_all.svg" data-only="4" style="width:100.0%" /></p>
+<p><img data-src="images/dtree/split_candidates_50_quantiles.svg" data-only="5-" style="width:100.0%" /></p>
+</div>
+</div>
+</div>
+</section>
+
+<section id="numeric-targets-regression-numerické-požadované-výstupy-regresia" class="title-slide slide level2">
+<h2><span class="en">Numeric Targets: Regression</span> <span class="sk">Numerické požadované výstupy: regresia</span></h2>
+<p><span class="subtitle"><span><span class="en">Decision Trees on Numeric Data</span> <span class="sk">Rozhodovacie stromy na numerických dátach</span></span></span></p>
+<div class="columns space-before1">
+<div class="column spread1" style="width:49%;">
+<p><span class="en block">How to Form Leaves</span> <span class="sk block">Ako vytvoriť listy</span></p>
+<ul>
+<li id="section">
+<span class="en">With classification we used the majority class;</span> <span class="sk">Pri klasifikácii sme použili väčšinovú triedu;</span>
+</li>
+<li id="section">
+<span class="en">Now our outputs are continuous;</span> <span class="sk">Teraz sú výstupy spojité;</span>
+</li>
+<li id="section">
+<span class="en">We can use e.g.:</span> <span class="sk">Môžeme použiť napr.:</span>
+<div class="space-before05 spread1" data-onslide="2-">
+<ul>
+<li id="section">
+<span class="en">Sample mean (arithmetic average);</span> <span class="sk">Strednú hodnotu vzorky (aritmetický priemer);</span>
+<p><span class="math display">\[
+\bar{X} = \sum_{i=1}^N \frac{x_i}{N}
+\]</span></p>
+<ul>
+<li id="section">
+<span class="math inline">\(N\)</span>: <span class="en">size of the sample;</span> <span class="sk">veľkosť vzorky;</span>
+</li>
+</ul>
+</li>
+<li id="section">
+<span class="en">Sample median;</span> <span class="sk">Medián vzorky;</span>
+</li>
+<li id="section">
+…
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div><div class="column" style="width:2%;">
+
+</div><div class="column spread1" data-onslide="3-" style="width:49%;">
+<p><span class="en block">How to Select Attributes</span> <span class="sk block">Ako zvoliť atribút</span></p>
+<ul>
+<li id="section">
+<span class="en">With classification we used information gain / Gini index;</span> <span class="sk">Pri klasifikácii sme používali informačný zisk / Gini index;</span>
+</li>
+<li id="section">
+<span class="en">Again, that does not work for continuous outputs;</span> <span class="sk">To znovu nefunguje pre spojité výstupy;</span>
+</li>
+<li id="section" data-onslide="4-">
+<span class="en">We need some measure of spread – e.g. <strong>sample variance</strong>:</span> <span class="sk">Potrebujeme vedieť o rozpätí dát – napr. <strong>rozptyl vzorky</strong>:</span>
+<p><span class="math display">\[
+\mathrm{Var}(X) = \sum_{i=1}^N
+\frac{
+  (x_i - \bar{X})^2
+}{N}
+\]</span></p>
+<ul>
+<li id="section">
+<span class="en">How much values deviate from the mean on average;</span> <span class="sk">Ako veľmi sa hodnoty v priemere líšia od strednej hodnoty;</span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section id="decision-trees-for-regression-rozhodovacie-stromy-na-regresiu" class="title-slide slide level2">
+<h2><span class="en">Decision Trees for Regression</span> <span class="sk">Rozhodovacie stromy na regresiu</span></h2>
+<p><span class="subtitle"><span><span class="en">Decision Trees on Numeric Data</span> <span class="sk">Rozhodovacie stromy na numerických dátach</span></span></span></p>
+<ul>
+<li id="section">
+<span class="en">Decision trees will usually have constant-valued leaves.</span> <span class="sk">Listy rozhodovacích stromov sú zväčša ohodnotené konštantami.</span>
+<ul>
+<li id="section">
+<span class="en">I.e. for regression <strong>piece-wise constant</strong> functions will arise.</span> <span class="sk">T.j. pri regresii vzniknú <strong>po častiach konštantné</strong> funkcie.</span>
+</li>
+<li id="section">
+<span class="en">Trees with <strong>functions at leaves</strong> have been investigated;</span> <span class="sk">Skúmali sa aj stromy, ktoré majú <strong>na listoch funkcie</strong>;</span>
+</li>
+<li id="section">
+<span class="en">But most practical implementations do not have them;</span> <span class="sk">Ale väčšina praktických implementácií ich neobsahuje;</span>
+</li>
+</ul>
+</li>
+</ul>
+<div class="space-before1">
+<p><img data-src="images/dtree/dtree_sin.svg" style="width:60.0%" /></p>
+</div>
+</section>
+</section>
+<section>
+<section id="ensemble-methods-komisie-modelov" class="title-slide slide level1 empty">
+<h1 class="empty"><span class="en">Ensemble Methods</span> <span class="sk">Komisie modelov</span></h1>
+<p><img data-src="images/dtree/forest.svg" style="width:40.0%" /></p>
+</section>
+<section id="heading1-2" class="title-slide slide level2">
+<h2><span><span class="en">Ensemble Methods</span> <span class="sk">Komisie modelov</span></span></h2>
+<ul>
+<li id="section">
+<span class="en">We can often get better results by combining several models into an <strong>ensemble</strong>.</span> <span class="sk">Výsledky sa často dajú zlepšiť tak, že spojíme viacero modelov do <strong>komisie</strong>.</span>
+</li>
+<li id="section">
+<span class="en">The prediction of the ensemble is determined by <strong>voting / averaging</strong>.</span> <span class="sk">Predikcia komisie sa určí <strong>hlasovaním / priemerovaním</strong>.</span>
+</li>
+</ul>
+<div class="columns space-before">
+<div class="column" style="width:49%;">
+<div data-onslide="2-">
+<ul>
+<li id="section" data-onslide="2-">
+<span class="en"><strong>Correct</strong> models will <strong>agree</strong>; <strong>errors</strong> tend to be <strong>stochastic</strong>.</span> <span class="sk"><strong>Správne</strong> modely sa <strong>zhodnú</strong>; <strong>chyby</strong> zvyknú byť <strong>stochastické</strong>.</span>
+</li>
+</ul>
+<figure>
+<img data-src="images/dtree/forest.svg" style="width:100.0%" alt="from [5], with modifications podľa [5], s úpravami" /><figcaption aria-hidden="true"><span class="en">from <span class="citation" data-cites="python_forests">[5]</span>, with modifications</span> <span class="sk">podľa <span class="citation" data-cites="python_forests">[5]</span>, s úpravami</span></figcaption>
+</figure>
+</div>
+</div><div class="column" style="width:2%;">
+
+</div><div class="column" style="width:49%;">
+<div data-onslide="3-">
+<ul>
+<li id="section" data-onslide="3-">
+<span class="en">Ensembles can also be <strong>more expressive</strong>.</span> <span class="sk">Komisie môžu byť aj <strong>expresívnejšie</strong>.</span>
+</li>
+</ul>
+<figure>
+<img data-src="images/dtree/ensemble_lines.svg" style="width:80.0%" alt="from [2] z [2]" /><figcaption aria-hidden="true"><span class="en">from <span class="citation" data-cites="bengio2009learning">[2]</span></span> <span class="sk">z <span class="citation" data-cites="bengio2009learning">[2]</span></span></figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+
+<section id="homogenous-and-heterogenous-ensembles-homogénne-a-heterogénne-komisie" class="title-slide slide level2">
+<h2><span class="en">Homogenous and Heterogenous Ensembles</span> <span class="sk">Homogénne a heterogénne komisie</span></h2>
+<p><span class="subtitle"><span><span class="en">Ensemble Methods</span> <span class="sk">Komisie modelov</span></span></span></p>
+<div class="spread05">
+<p><span class="block en space-before">Heterogeneous Ensembles</span> <span class="block sk space-before">Heterogénne komisie</span></p>
+<ul>
+<li id="section">
+<span class="en">Train several different kinds of models.</span> <span class="sk">Trénuje sa niekoľko rôznych druhov modelov.</span>
+</li>
+<li id="section">
+<span class="en">E.g. KNN, a naïve Bayes classifier, a decision tree, …</span> <span class="sk">Napr. KNN, naivný bayesovský klasifikátor, rozhodovací strom, …</span>
+</li>
+<li id="section">
+<span class="en">Tends to work very well.</span> <span class="sk">Typicky funguje veľmi dobre.</span>
+</li>
+<li id="section">
+<span class="en">Models from different classes often make very different errors.</span> <span class="sk">Modely rôznych druhov často robia veľmi rozdielne chyby.</span>
+</li>
+</ul>
+</div>
+<div class="space-before1 spread05" data-onslide="2-">
+<p><span class="block en">Homogeneous Ensembles</span> <span class="block sk">Homogénne komisie</span></p>
+<ul>
+<li id="section">
+<span class="en">Train multiple models of the same kind.</span> <span class="sk">Trénujú sa viaceré modely toho istého typu.</span>
+</li>
+<li id="section">
+<span class="en">E.g. tree-based like <strong>random forests</strong>, <strong>XGBoost</strong>, <strong>LightGBM</strong>, …</span> <span class="sk">Napr. stromové modely ako <strong>náhodné lesy</strong>, <strong>XGBoost</strong>, <strong>LightGBM</strong>, …</span>
+</li>
+<li id="section">
+<span class="en">A bit easier to automate</span> <span class="sk">O niečo ľahšie automatizovať.</span>
+</li>
+<li id="section">
+<span class="en">We use other ways to achieve different models:</span> <span class="sk">Získanie rozdielnych modelov sa dosahuje inak:</span>
+<ul>
+<li id="section">
+<span class="en">Different hyperparameters;</span> <span class="sk">Rozličné hyperparametre;</span>
+</li>
+<li id="section">
+<span class="en">Different data: <strong>bagging</strong>, <strong>boosting</strong>;</span> <span class="sk">Rozličné dáta: <strong>bagging</strong>, <strong>boosting</strong>;</span>
+</li>
+<li id="section">
+…
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+<section id="independent-and-dependent-models-nezávislé-a-závislé-modely" class="title-slide slide level2">
+<h2><span class="en">Independent and Dependent Models</span> <span class="sk">Nezávislé a závislé modely</span></h2>
+<p><span class="subtitle"><span><span class="en">Ensemble Methods</span> <span class="sk">Komisie modelov</span></span></span></p>
+<div class="columns">
+<div class="column" style="width:49%;">
+<p><span class="en block">Independent Models</span> <span class="sk block">Nezávislé modely</span></p>
+<ul>
+<li id="section">
+<span class="en">Each model is trained <strong>independently</strong>.</span> <span class="sk">Každý model sa trénuje <strong>nezávisle</strong>.</span>
+<ul>
+<li id="section">
+<span class="en">Can outweigh each other’s errors.</span> <span class="sk">Môžu navzájom prevážiť svoje chyby.</span>
+</li>
+<li id="section">
+<span class="en">Can be trained <strong>in parallel</strong>.</span> <span class="sk">Dajú sa trénovať <strong>paralelne</strong>.</span>
+</li>
+</ul>
+</li>
+<li id="section">
+<span class="en">Primarily to <strong>improve generalization</strong>.</span> <span class="sk">Hlavne na <strong>zlepšenie zovšeobecnenia</strong>.</span>
+</li>
+<li id="section">
+<span class="en">E.g. <strong>bagging</strong>.</span> <span class="sk">Napr. <strong>bagging</strong>.</span>
+</li>
+</ul>
+<figure>
+<img data-src="images/dtree/forest.svg" class="space-before05" style="width:45.0%" alt="from [5], with modifications podľa [5], s úpravami" /><figcaption aria-hidden="true"><span class="en">from <span class="citation" data-cites="python_forests">[5]</span>, with modifications</span> <span class="sk">podľa <span class="citation" data-cites="python_forests">[5]</span>, s úpravami</span></figcaption>
+</figure>
+</div><div class="column" style="width:2%;">
+
+</div><div class="column" data-onslide="2-" style="width:49%;">
+<p><span class="en block">Mutually Dependent Models</span> <span class="sk block">Vzájomne závislé modely</span></p>
+<ul>
+<li id="section">
+<span class="en">Each model is trained to correct previous models’ errors.</span> <span class="sk">Každý model sa učí korigovať chyby predošlých modelov.</span>
+<ul>
+<li id="section">
+<span class="en">They need to be trained <strong>sequentially</strong>.</span> <span class="sk">Treba ich trénovať <strong>sekvenčne</strong>.</span>
+</li>
+<li id="section">
+<span class="en">Increases <strong>expressiveness</strong>.</span> <span class="sk">Zvyšuje <strong>expresivitu</strong>.</span>
+</li>
+</ul>
+</li>
+<li id="section">
+<span class="en">Primarily to <strong>increase accuracy</strong>.</span> <span class="sk">Primárne na <strong>zvýšenie presnosti</strong>.</span>
+</li>
+<li id="section">
+<span class="en">Napr. <strong>boosting</strong>.</span> <span class="sk">Napr. <strong>boosting</strong>.</span>
+</li>
+</ul>
+<p><img data-src="images/dtree/boosting.svg" class="space-before" style="width:90.0%" /></p>
+</div>
+</div>
+<div class="negspace-before025" data-onslide="3-">
+<p><span class="en block">Hybrid Approaches</span> <span class="sk block">Hybridné prístupy</span></p>
+<ul>
+<li id="section">
+<span class="en">E.g. <strong>stacking</strong>:</span> <span class="sk">Napr. <strong>stacking</strong>:</span>
+<ul>
+<li id="section">
+<span class="en">Build several independent models.</span> <span class="sk">Vytvorí sa niekoľko nezávislých modelov.</span>
+</li>
+<li id="section">
+<span class="en">Then use <strong>their outputs</strong> to augment the dataset and <strong>train on top of that</strong>.</span> <span class="sk"><strong>Ich výstupy</strong> sa doplnia do dátovej množiny a <strong>na tom sa trénuje ďalší model.</strong></span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+<section id="bagging" class="title-slide slide level2">
+<h2>Bagging</h2>
+<p><span class="subtitle"><span><span class="en">Ensemble Methods</span> <span class="sk">Komisie modelov</span></span></span></p>
+<div class="columns space-before15">
+<div class="column spread05" style="width:54%;">
+<p><span class="en block">Bagging</span> <span class="sk block">Bagging</span></p>
+<ul>
+<li id="section">
+<strong>Bagging</strong> = <strong>b</strong>ootstrap <strong>agg</strong>regat<strong>ing</strong>.
+<div class="spread05">
+<ul>
+<li id="section">
+<span class="en">Use <strong>bootstrapping</strong> to get a number of datasets.</span> <span class="sk">Pomocou <strong>bootstrapping-u</strong> získame viac dátových množín.</span>
+</li>
+<li id="section">
+<span class="en">Train a model on each.</span> <span class="sk">Na každej natrénujeme model.</span>
+</li>
+</ul>
+</div>
+</li>
+<li id="section" class="space-before1">
+<span class="en"><strong>Bootstrapping</strong> – selecting <span class="math inline">\(n\)</span> from <span class="math inline">\(n\)</span> with repetition:</span> <span class="sk"><strong>Bootstrapping</strong> – vyberáme <span class="math inline">\(n\)</span> z <span class="math inline">\(n\)</span> s opakovaním:</span>
+</li>
+</ul>
+<p><img data-src="images/dtree/bootstrapping.svg" style="width:100.0%" /></p>
+</div><div class="column" style="width:2%;">
+
+</div><div class="column" style="width:44%;">
+<div class="spread075" data-only="2-3">
+<p><span class="en block">Advantages of Bagging</span> <span class="sk block">Výhody bagging-u</span></p>
+<ul>
+<li id="section">
+<span class="en">Independent models: easy to <strong>parallelize</strong>.</span> <span class="sk">Nezávislé modely: ľahko sa <strong>paralelizuje</strong>.</span>
+</li>
+<li id="section">
+<span class="en">Applicable to arbitrary class of models.</span> <span class="sk">Aplikovateľný na ľubovoľnú triedu modelov.</span>
+</li>
+</ul>
+</div>
+<div class="spread075 space-before1" data-only="3">
+<p><span class="en block">Extensions to Bagging</span> <span class="sk block">Rozšírenia bagging-u</span></p>
+<ul>
+<li id="section">
+<span class="en">Bagging is easy to extend.</span> <span class="sk">Bagging sa dá ľahko rozširovať.</span>
+</li>
+<li id="section">
+<span class="en">E.g. <strong>random forests</strong>:</span> <span class="sk">Napr. <strong>náhodné lesy</strong>:</span>
+<ul>
+<li id="section">
+<span class="en">Based on decision trees;</span> <span class="sk">Na báze rozhodovacích stromov;</span>
+</li>
+<li id="section">
+<span class="en">They use bagging;</span> <span class="sk">Využíva sa bagging;</span>
+</li>
+<li id="section">
+<span class="en">But also the selection of branching attributes is partially stochastic.</span> <span class="sk">Ale čiastočne stochastický je napr. aj výber atribútov na vetvenie.</span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div data-only="4-">
+<p><span class="en block">Bagging and Outliers</span> <span class="sk block">Bagging a odľahlé body</span></p>
+<ul>
+<li id="section">
+<span class="en">An interesting insight into why and how bagging works is given in</span> <span class="sk">Zaujímavý náhľad do toho prečo a ako bagging funguje, poskytuje</span> <span class="citation" data-cites="grandvalet2004bagging">[3]</span>:
+<ul>
+<li id="section">
+<span class="en">Outliers can have a drastic effect on predictions.</span> <span class="sk">Odľahlé body môžu mať drastický vplyv na predikcie.</span>
+</li>
+<li id="section">
+<span class="en">Bagging <strong>equalizes the potential influence</strong> of points.</span> <span class="sk">Bagging <strong>zrovnomerňuje potenciálny vplyv</strong> bodov.</span>
+</li>
+<li id="section">
+<span class="en">Not every resampled dataset will have the same outliers.</span> <span class="sk">Nie v každej navzorkovanej množine budú tie isté body.</span>
+</li>
+</ul>
+</li>
+</ul>
+<p><img data-src="images/dtree/bagging_leverage.png" class="space-before1" style="width:100.0%" /></p>
+</div>
+</div>
+</div>
+<!-- ## AdaBoost
+[{{
+  heading1}}]{.subtitle}
+
+
+
+
+## Gradient Boosting
+[{{
+  heading1}}]{.subtitle} -->
+</section>
+
+<section id="boosting" class="title-slide slide level2">
+<h2>Boosting</h2>
+<p><span class="subtitle"><span><span class="en">Ensemble Methods</span> <span class="sk">Komisie modelov</span></span></span></p>
+<p><span class="en space-before"><strong>Boosting:</strong> Each model is learning to correct the errors of its predecessors.</span> <span class="sk space-before"><strong>Boosting:</strong> Každý model sa učí korigovať chyby tých predchádzajúcich.</span></p>
+<p><img data-src="images/dtree/boosting.svg" class="space-before" style="width:90.0%" /></p>
+<div class="columns space-before">
+<div class="column" data-onslide="2-" style="width:50%;">
+<ul>
+<li id="section">
+<span class="en">Properties:</span> <span class="sk">Vlastnosti:</span>
+<ul>
+<li id="section">
+<span class="en">Models do not try to solve the problem independently.</span> <span class="sk">Modely sa nesnažia vyriešiť celý problém nezávisle.</span>
+</li>
+<li id="section">
+<span class="en">They are correcting the output of other models.</span> <span class="sk">Každý len koriguje výstupy predošlých.</span>
+</li>
+<li id="section">
+<span class="en">Necessarily <strong>sequential</strong>.</span> <span class="sk">Nevyhnutne <strong>sekvenčný</strong> postup.</span>
+</li>
+</ul>
+</li>
+</ul>
+</div><div class="column" data-onslide="3-" style="width:50%;">
+<ul>
+<li id="section">
+<span class="en">Gradient boosting:</span> <span class="sk">Gradientný boosting:</span>
+<ul>
+<li id="section">
+<span class="en">E.g. <strong>XGBoost</strong>, <strong>LightGBM</strong>.</span> <span class="sk">Napr. <strong>XGBoost</strong>, <strong>LightGBM</strong>.</span>
+</li>
+<li id="section">
+<span class="en">Basically gradient descent, but by adding models.</span> <span class="sk">V podstate ako met. klesajúceho gradientu, ale pridávaním modelov.</span>
+</li>
+<li id="section">
+<span class="en">Very effective: often <strong>wins data competitions</strong>.</span> <span class="sk">Veľmi efektívne: často <strong>vyhráva dátové súťaže</strong>.</span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section id="stacking" class="title-slide slide level2">
+<h2>Stacking</h2>
+<p><span class="subtitle"><span><span class="en">Ensemble Methods</span> <span class="sk">Komisie modelov</span></span></span></p>
+<div class="columns">
+<div class="column space-before" style="width:60%;">
+<p><img data-src="images/dtree/stacking.svg" style="width:100.0%" /></p>
+<ul>
+<li id="section" class="space-before15" data-onslide="3-">
+<span class="en"><strong>Passthrough</strong> is optional: the next level model may only get the base model outputs and not the original data.</span> <span class="sk"><strong>Passthrough</strong> sa nemusí použiť: model vyššej úrovne môže dostať len výstupy zo základných modelov bez pôvodných dát.</span>
+</li>
+</ul>
+</div><div class="column" style="width:40%;">
+<ul>
+<li id="section">
+<span class="en">A hybrid of an independent and dependent model ensemble:</span> <span class="sk">Hybrid komisie s nezávislými a závislými modelmi:</span>
+<ul>
+<li id="section">
+<span class="en">Build several independent models.</span> <span class="sk">Vytvorí sa niekoľko nezávislých modelov.</span>
+</li>
+<li id="section">
+<span class="en">Then use their outputs to augment the dataset and train a next level model on top of that.</span> <span class="sk">Ich výstupy sa doplnia do dátovej množiny a na tom sa trénuje model vyššej úrovne.</span>
+</li>
+<li id="section">
+<span class="en">Stacking can have more than one level.</span> <span class="sk">Stacking môže mať viac než jednu vrstvu.</span>
+</li>
+</ul>
+</li>
+<li id="section" class="space-before" data-onslide="2-">
+<span class="en">Stacking can even be used to learn model weights for a simple voting/averaging ensemble:</span> <span class="sk">Stacking sa dá použiť aj na určenie váh v jednoduchej hlasovacej/priemerovacej komisii:</span>
+<ul>
+<li id="section">
+<span class="en">Using a linear (or linear + logistic) next level model;</span> <span class="sk">Model vyššej úrovne je lineárny (al. lineárny + logistický;)</span>
+</li>
+<li id="section">
+<span class="en">With passthrough off;</span> <span class="sk">Nepoužije sa passthrough;</span>
+</li>
+<li id="section">
+<span class="en">The output just weights and combines base models’ outputs.</span> <span class="sk">Výstup len váhuje a kombinuje výstupy základných modelov.</span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section>
+<section id="an-example-constructing-a-tree-using-entropy-príklad-konštrukcia-stromu-na-základe-entropie" class="title-slide slide level1 empty">
+<h1 class="empty"><span class="en">An Example: Constructing a Tree using Entropy</span> <span class="sk">Príklad: konštrukcia stromu na základe entropie</span></h1>
+
+</section>
+<section id="computing-the-entropy-for-cone-quality-výpočet-entropie-pre-kvalitu-kornúta" class="title-slide slide level2">
+<h2><span class="en">Computing the Entropy for “Cone Quality”</span> <span class="sk">Výpočet entropie pre “kvalitu kornúta”</span></h2>
+<p><span class="subtitle"><span><span class="en">An Example: Constructing a Tree using Entropy</span> <span class="sk">Príklad: konštrukcia stromu na základe entropie</span></span></span></p>
+<div class="columns" style="font-size: 75%">
+<div class="column" style="width:50%;">
+<p><span class="math display">\[
+H(C|A_k) = \sum_{a_{k,j}} P(a_{k,j}) \cdot H(C | a_{k,j})
+\]</span></p>
+</div><div class="column" style="width:50%;">
+<p><span class="math display">\[
+H(C | a_{k,j}) = -\sum_{c_i} p(c_i | a_{k,j} ) \cdot \log_b p(c_i | a_{k,j} )
+\]</span></p>
+</div>
+</div>
+<div class="columns">
+<div class="column" style="width:40%;">
+<ul>
+<li id="section">
+<span class="en">Which attribute to use for our root branching?</span> <span class="sk">Ktorý atribút použiť pre koreňové vetvenie?</span>
+</li>
+<li id="section">
+<span class="en">Let’s compute the entropies!</span> <span class="sk">Vypočítajme si entropie!</span>
+</li>
+<li id="section" style="color: red" data-only="1">
+<span class="en">Note: we’ll be constructing a full tree (no pruning);</span> <span class="sk">Pozn.: bude tvoriť úplný strom (bez prerezávania);</span>
+<ul>
+<li id="section">
+<span class="en">We’ll add new branches until the classes are perfectly separated;</span> <span class="sk">Pridávame vetvenia kým triedy nie sú perfektne oddelené;</span>
+</li>
+<li id="section">
+<span class="en">Or until we run out of attributes;</span> <span class="sk">Alebo sa vyčerpajú všetky atribúty;</span>
+</li>
+</ul>
+</li>
+</ul>
+<div data-onslide="2-">
+<p><span class="block en">Cone Quality</span> <span class="block sk">Kvalita kornúta</span></p>
+</div>
+<div data-only="2">
+<p><span class="math display">\[
+\begin{matrix}
+\color{blue} P(great) = 3 / 10
+\end{matrix}
+\]</span></p>
+</div>
+<div data-only="3">
+<p><span class="math display">\[
+\begin{matrix}
+{\color{blue} P(great) = 3 / 10} \\
+{\color{green} P(Y | great) = 2 / 3} \\
+{\color{red} P(N | great) = 1 / 3}
+\end{matrix}
+\]</span></p>
+</div>
+<div data-only="4-" style="font-size: 75%">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><span class="math inline">\(A_k\)</span></th>
+<th><span class="math inline">\(P(A_k)\)</span></th>
+<th><span class="math inline">\(P(Y | A_k)\)</span></th>
+<th><span class="math inline">\(P(N | A_k)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">great</td>
+<td>3/10</td>
+<td>2/3</td>
+<td>1/3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">good</td>
+<td>4/10</td>
+<td>3/4</td>
+<td>1/4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">poor</td>
+<td>3/10</td>
+<td>0/3</td>
+<td>3/3</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div><div class="column" style="width:60%;">
+<p><img data-src="images/dtree/tables_dtree_ice_cream.svg" data-only="1" style="width:100.0%" /> <img data-src="images/dtree/tables_dtree_ice_cream_2.svg" data-only="2" style="width:100.0%" /> <img data-src="images/dtree/tables_dtree_ice_cream_3.svg" data-only="3-" style="width:100.0%" /></p>
+</div>
+</div>
+<div data-only="4">
+<p><span class="math display">\[
+\begin{aligned}
+&amp;H(C | \text{cone quality}) = \\
+&amp;- P(\text{great}) \left[
+    P(Y| \text{great}) \log_b P(Y| \text{great}) +
+    P(N| \text{great}) \log_b P(N| \text{great})
+\right] + \\
+&amp;- P(\text{good}) \left[
+    P(Y| \text{good}) \log_b P(Y| \text{good}) +
+    P(N| \text{good}) \log_b P(N| \text{good})
+\right] + \\
+&amp;- P(\text{poor}) \left[
+    P(Y| \text{poor}) \log_b P(Y| \text{poor}) +
+    P(N| \text{poor}) \log_b P(N| \text{poor})
+\right]
+\end{aligned}
+\]</span></p>
+</div>
+<div class="columns">
+<div class="column" data-only="5-6" style="width:60%;">
+<p><span class="math display">\[
+\begin{aligned}
+&amp;H(C | \text{cone quality}) = \\
+&amp;-3/10 \cdot [2/3 \cdot \log_2(2/3) + 1/3 \log_2 1/3 ] \\
+&amp;-4/10 \cdot [3/4 \cdot \log_2(3/4) + 1/4 \log_2 1/4 ] \\
+&amp;-3/10 \cdot [0/3 \cdot \log_2(0/3) + 3/3 \log_2 3/3 ]
+\end{aligned}
+\]</span></p>
+</div><div class="column space-before15" data-only="7" style="width:60%;">
+<p><span class="math display">\[
+\color{green} H(C | \text{cone quality}) = 0.6
+\]</span></p>
+</div><div class="column space-before15" data-only="6-7" style="color:red; width: 40%">
+<ul>
+<li id="section">
+<span class="en">Note: when we encounter <span class="math inline">\(0 \log_b 0\)</span>, we treat it as <span class="math inline">\(0\)</span>;</span> <span class="sk">Pozn.: <span class="math inline">\(0 \log_b 0\)</span> berieme ako <span class="math inline">\(0\)</span>;</span>
+</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section id="computing-the-entropy-for-ice-cream-quality-výpočet-entropie-pre-kvalitu-zmrzliny" class="title-slide slide level2">
+<h2><span class="en">Computing the Entropy for “Ice Cream Quality”</span> <span class="sk">Výpočet entropie pre “kvalitu zmrzliny”</span></h2>
+<p><span class="subtitle"><span><span class="en">An Example: Constructing a Tree using Entropy</span> <span class="sk">Príklad: konštrukcia stromu na základe entropie</span></span></span></p>
+<div class="columns" style="font-size: 75%">
+<div class="column" style="width:50%;">
+<p><span class="math display">\[
+H(C|A_k) = \sum_{a_{k,j}} P(a_{k,j}) \cdot H(C | a_{k,j})
+\]</span></p>
+</div><div class="column" style="width:50%;">
+<p><span class="math display">\[
+H(C | a_{k,j}) = -\sum_{c_i} p(c_i | a_{k,j} ) \cdot \log_b p(c_i | a_{k,j} )
+\]</span></p>
+</div>
+</div>
+<div class="columns">
+<div class="column" style="width:40%;">
+<ul>
+<li id="section">
+<span class="en">Which attribute to use for our root branching?</span> <span class="sk">Ktorý atribút použiť pre koreňové vetvenie?</span>
+</li>
+<li id="section">
+<span class="en">Let’s compute the entropies!</span> <span class="sk">Vypočítajme si entropie!</span>
+</li>
+</ul>
+<p><span class="block en">Ice Cream Quality</span> <span class="block sk">Kvalita zmrzliny</span></p>
+<div style="font-size: 75%">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><span class="math inline">\(A_k\)</span></th>
+<th><span class="math inline">\(P(A_k)\)</span></th>
+<th><span class="math inline">\(P(Y | A_k)\)</span></th>
+<th><span class="math inline">\(P(N | A_k)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">great</td>
+<td>2/10</td>
+<td>2/2</td>
+<td>0/2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">good</td>
+<td>4/10</td>
+<td>3/4</td>
+<td>1/4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">poor</td>
+<td>4/10</td>
+<td>0/4</td>
+<td>4/4</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div><div class="column" style="width:60%;">
+<p><img data-src="images/dtree/tables_dtree_ice_cream.svg" style="width:100.0%" /></p>
+</div>
+</div>
+<div data-onslide="2-">
+<p><span class="math display">\[
+\begin{aligned}
+&amp;H(C | \text{ice cream quality}) = \\
+&amp;-2/10 \cdot [2/2 \cdot \log_2(2/2) + 0/2 \log_2 0/2 ] \\
+&amp;-4/10 \cdot [3/4 \cdot \log_2(3/4) + 1/4 \log_2 1/4 ] \\
+&amp;-4/10 \cdot [0/4 \cdot \log_2(0/4) + 4/4 \log_2 4/4 ]
+\end{aligned}
+\]</span></p>
+</div>
+<div data-onslide="3-">
+<p><span class="math display">\[
+\color{green} = 0.325
+\]</span></p>
+</div>
+</section>
+
+<section id="computing-the-entropy-for-weather-výpočet-entropie-pre-počasie" class="title-slide slide level2">
+<h2><span class="en">Computing the Entropy for “Weather”</span> <span class="sk">Výpočet entropie pre “počasie”</span></h2>
+<p><span class="subtitle"><span><span class="en">An Example: Constructing a Tree using Entropy</span> <span class="sk">Príklad: konštrukcia stromu na základe entropie</span></span></span></p>
+<div class="columns" style="font-size: 75%">
+<div class="column" style="width:50%;">
+<p><span class="math display">\[
+H(C|A_k) = \sum_{a_{k,j}} P(a_{k,j}) \cdot H(C | a_{k,j})
+\]</span></p>
+</div><div class="column" style="width:50%;">
+<p><span class="math display">\[
+H(C | a_{k,j}) = -\sum_{c_i} p(c_i | a_{k,j} ) \cdot \log_b p(c_i | a_{k,j} )
+\]</span></p>
+</div>
+</div>
+<div class="columns">
+<div class="column" style="width:40%;">
+<ul>
+<li id="section">
+<span class="en">Which attribute to use for our root branching?</span> <span class="sk">Ktorý atribút použiť pre koreňové vetvenie?</span>
+</li>
+<li id="section">
+<span class="en">Let’s compute the entropies!</span> <span class="sk">Vypočítajme si entropie!</span>
+</li>
+</ul>
+<p><span class="block en">Weather</span> <span class="block sk">Počasie</span></p>
+<div style="font-size: 75%">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><span class="math inline">\(A_k\)</span></th>
+<th><span class="math inline">\(P(A_k)\)</span></th>
+<th><span class="math inline">\(P(Y | A_k)\)</span></th>
+<th><span class="math inline">\(P(N | A_k)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">hot</td>
+<td>3/10</td>
+<td>3/3</td>
+<td>0/3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">warm</td>
+<td>4/10</td>
+<td>2/4</td>
+<td>2/4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">cold</td>
+<td>3/10</td>
+<td>0/3</td>
+<td>3/3</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div><div class="column" style="width:60%;">
+<p><img data-src="images/dtree/tables_dtree_ice_cream.svg" style="width:100.0%" /></p>
+</div>
+</div>
+<div class="columns">
+<div class="column" style="width:55%;">
+<div data-onslide="2-">
+<p><span class="math display">\[
+\begin{aligned}
+&amp;H(C | \text{weather}) = \\
+&amp;-3/10 \cdot [3/3 \cdot \log_2(3/3) + 0/3 \log_2 0/3 ] \\
+&amp;-4/10 \cdot [2/4 \cdot \log_2(2/4) + 2/4 \log_2 2/4 ] \\
+&amp;-3/10 \cdot [0/3 \cdot \log_2(0/3) + 3/3 \log_2 3/3 ]
+\end{aligned}
+\]</span></p>
+</div>
+<div data-onslide="3-">
+<p><span class="math display">\[
+\color{green} = 0.4
+\]</span></p>
+</div>
+</div><div class="column space-before15" data-onslide="4-" style="width:45%;">
+<p><span class="math display">\[
+\begin{aligned}
+H(C | \text{cone quality}) &amp;= {\color{red} 0.6} \\
+H(C | {\color{green} \text{ice cream quality}} ) &amp;= {\color{green} 0.325} \\
+H(C | \text{weather}) &amp;= {\color{red} 0.4}
+\end{aligned}
+\]</span></p>
+</div>
+</div>
+</section>
+
+<section id="constructing-the-root-branching-zostavenie-koreňového-vetvenia" class="title-slide slide level2">
+<h2><span class="en">Constructing the Root Branching</span> <span class="sk">Zostavenie koreňového vetvenia</span></h2>
+<p><span class="subtitle"><span><span class="en">An Example: Constructing a Tree using Entropy</span> <span class="sk">Príklad: konštrukcia stromu na základe entropie</span></span></span></p>
+<div class="columns">
+<div class="column spread1" style="width:40%;">
+<ul>
+<li id="section">
+<span class="en">Now compare the “ice cream” column with “have one?”;</span> <span class="sk">Teraz si porovnajme stĺpec “ice cream” s “have one?”;</span>
+<div class="space-before05 spread05">
+<ul>
+<li id="section">
+<span class="en">Are there any values for which the outcome is already clear?</span> <span class="sk">Je pre niektoré hodnoty už jasné, aký má byť výstup?</span>
+</li>
+<li id="section">
+<span class="en">There will be: recall that we had 0 entropy for “poor” and “great”;</span> <span class="sk">Áno, bude: spomeňte si, že entropia pre “poor” a “great” bola 0;</span>
+</li>
+</ul>
+</div>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en">So how is it for “great”?</span> <span class="sk">Tak ako je to pre “great”?</span>
+<ul>
+<li id="section" data-onslide="3-">
+<span class="en">The output seems to be <span style="color: green">“yes”</span> in every case;</span> <span class="sk">Zdá sa, že výstup je v každom prípade <span style="color: green">“yes”</span>;</span>
+</li>
+</ul>
+</li>
+<li id="section" data-onslide="4-">
+<span class="en">The same for “poor”;</span> <span class="sk">Podobne pre “poor”;</span>
+</li>
+<li id="section" data-onslide="5-">
+<span class="en">For “good” the classes are still mixed;</span> <span class="sk">Pre “good” sú triedy stále zmiešané;</span>
+</li>
+</ul>
+</div><div class="column" style="width:60%;">
+<p><img data-src="images/dtree/tables_dtree_ice_cream_4.svg" style="width:100.0%" /></p>
+<p><img data-src="images/dtree/dtree_make_leaf.svg" data-only="2" style="width:50.0%" /> <img data-src="images/dtree/dtree_make_leaf_2.svg" data-only="3" style="width:50.0%" /> <img data-src="images/dtree/dtree_make_leaf_3.svg" data-only="4-" style="width:50.0%" /></p>
+</div>
+</div>
+</section>
+
+<section id="selecting-the-next-attribute-výber-nasledujúceho-atribútu" class="title-slide slide level2">
+<h2><span class="en">Selecting the Next Attribute</span> <span class="sk">Výber nasledujúceho atribútu</span></h2>
+<p><span class="subtitle"><span><span class="en">An Example: Constructing a Tree using Entropy</span> <span class="sk">Príklad: konštrukcia stromu na základe entropie</span></span></span></p>
+<div class="columns">
+<div class="column spread1" style="width:50%;">
+<ul>
+<li id="section">
+<span class="en">Next we will be dealing with the case where “ice cream quality” is “good”;</span> <span class="sk">Ďalej pracujeme s prípadom, kedy “ice cream quality” je “good”;</span>
+<ul>
+<li id="section">
+<span class="en">I.e. we filter out the corresponding rows;</span> <span class="sk">T.j. vyfiltrujeme si príslušné riadky;</span>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en">And throw away the rest;</span> <span class="sk">A zvyšok zahodíme;</span>
+</li>
+</ul>
+</li>
+<li id="section" data-onslide="3-">
+<span class="en">Then we do exactly what we did before to select the next attribute;</span> <span class="sk">Potom zopakujeme ten istý postup pri výbere ďalšieho atribútu;</span>
+</li>
+</ul>
+<div data-onslide="4-">
+<p><span class="block">Cone Quality</span></p>
+<div style="font-size: 75%">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><span class="math inline">\(A_k\)</span></th>
+<th><span class="math inline">\(P(A_k)\)</span></th>
+<th><span class="math inline">\(P(Y | A_k)\)</span></th>
+<th><span class="math inline">\(P(N | A_k)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">great</td>
+<td>1/4</td>
+<td>1/1</td>
+<td>0/1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">good</td>
+<td>2/4</td>
+<td>2/2</td>
+<td>0/2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">poor</td>
+<td>1/4</td>
+<td>0/1</td>
+<td>1/1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="space-before1" data-onslide="5-" style="font-size: 80%">
+<p><span class="math display">\[
+\begin{aligned}
+&amp;H(C | \text{ice cream quality} = \text{good}, \text{weather}) = \\
+&amp;-1/4 \cdot [1/1 \cdot \log_2(1/1) + 0/1 \log_2 0/1 ] \\
+&amp;-2/4 \cdot [2/2 \cdot \log_2(2/2) + 0/2 \log_2 0/2 ] \\
+&amp; -1/4 \cdot [0/1 \cdot \log_2(0/1) + 1/1 \log_2 1/1 ] {\color{green} =  0}
+\end{aligned}
+\]</span></p>
+</div>
+</div><div class="column" style="width:50%;">
+<p><img data-src="images/dtree/tables_dtree_ice_cream_5.svg" data-only="1" style="width:100.0%" /></p>
+<p><img data-src="images/dtree/tables_dtree_ice_cream_6.svg" data-only="2-" style="width:80.0%" /></p>
+<p><img data-src="images/dtree/dtree_make_leaf_3.svg" style="width:35.0%" /></p>
+<div class="space-before1" style="font-size: 75%" data-only="3-">
+<p><span class="math display">\[
+\begin{aligned}
+H(C|A_k) &amp;= \sum_{a_{k,j}} P(a_{k,j}) \cdot H(C | a_{k,j}) \\
+H(C | a_{k,j}) &amp;= -\sum_{c_i} p(c_i | a_{k,j} ) \cdot \log_b p(c_i | a_{k,j} )
+\end{aligned}
+\]</span></p>
+</div>
+<div class="space-before15" data-onslide="6-" style="color: red">
+<ul>
+<li id="section">
+<span class="en">But entropy can’t be smaller than 0!</span> <span class="sk">Ale entropia nemôže byť menšia než 0!</span>
+<ul>
+<li id="section">
+<span class="en"><strong>No need</strong> to check the other attribute!</span> <span class="sk"><strong>Netreba</strong> ju počítať pre ďalší atribút!</span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+
+<section id="finishing-the-tree-dokončenie-stromu" class="title-slide slide level2">
+<h2><span class="en">Finishing the Tree</span> <span class="sk">Dokončenie stromu</span></h2>
+<p><span class="subtitle"><span><span class="en">An Example: Constructing a Tree using Entropy</span> <span class="sk">Príklad: konštrukcia stromu na základe entropie</span></span></span></p>
+<div class="columns space-before1">
+<div class="column spread1" style="width:50%;">
+<ul>
+<li id="section">
+<span class="en">We decided to use “cone quality” as our next attribute;</span> <span class="sk">Ako ďalší atribút sme vybrali “cone quality”;</span>
+</li>
+<li id="section">
+<span class="en">The entropy was 0 – we only need to form leaves now;</span> <span class="sk">Entropia bola 0 – už treba len vytvoriť listy;</span>
+<div class="space-before05 spread05" data-onslide="2-">
+<ul>
+<li id="yes">
+“great” <span class="math inline">\(\Rightarrow\)</span>“yes”;
+</li>
+<li id="yes">
+“good” <span class="math inline">\(\Rightarrow\)</span>“yes”;
+</li>
+<li id="no">
+“poor” <span class="math inline">\(\Rightarrow\)</span>“no”;
+</li>
+</ul>
+</div>
+</li>
+<li id="section" data-onslide="2-">
+<span class="en"><strong>And we are done!</strong></span> <span class="sk"><strong>A sme hotoví!</strong></span>
+</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<div data-only="1-2">
+<p><img data-src="images/dtree/tables_dtree_ice_cream_6.svg" style="width:80.0%" /></p>
+</div>
+<div class="space-before15" data-only="1">
+<p><img data-src="images/dtree/dtree_make_leaf_4.svg" style="width:45.0%" /></p>
+</div>
+<div class="space-before15" data-only="2-">
+<p><img data-src="images/dtree/dtree_zmrzlina_1.svg" style="width:45.0%" /></p>
+</div>
+</div>
+</div>
+<ul>
+<li id="section" data-only="3-">
+<span class="en">We can also rewrite the tree into rules;</span> <span class="sk">Strom môžeme prepísať aj na pravidlá;</span>
+<ul>
+<li id="section">
+IF <em>ice_cream_quality</em> is <em>great</em> THEN <em>have_one</em> is <em>yes</em>;
+</li>
+<li id="section">
+IF <em>ice_cream_quality</em> is <em>poor</em> THEN <em>have_one</em> is <em>no</em>;
+</li>
+<li id="section">
+IF <em>ice_cream_quality</em> is <em>good</em> AND <em>cone_quality</em> is <em>great</em> THEN <em>have_one</em> is <em>yes</em>;
+</li>
+<li id="section">
+IF <em>ice_cream_quality</em> is <em>good</em> AND <em>cone_quality</em> is <em>good</em> THEN <em>have_one</em> is <em>yes</em>;
+</li>
+<li id="section">
+IF <em>ice_cream_quality</em> is <em>good</em> AND <em>cone_quality</em> is <em>poor</em> THEN <em>have_one</em> is <em>no</em>;
+</li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section>
+<section id="thank-you-for-your-attention-ďakujem-za-pozornosť" class="title-slide slide level1 empty">
+<h1 class="empty"><span class="en">Thank you for your attention!</span> <span class="sk">Ďakujem za pozornosť!</span></h1>
+<div class="columns" style="margin-top: 2em">
+<div class="column centering vcentering" style="width:33%;">
+<p>Michal Gregor <br /> <a href="mailto:michal.gregor@uniza.sk">michal.gregor@uniza.sk</a> <br /> <a href="https://michalgregor.gitlab.io">michalgregor.gitlab.io</a> <br /> FEIT, KRIS; LUIZA <br /> <span class="en">University of Žilina</span> <span class="sk">Žilinská univerzita</span></p>
+</div><div class="column centering vcentering" style="width:33%;">
+<p><img data-src="modules/feit_logo.svg" style="width:100.0%" /></p>
+</div><div class="column centering vcentering" style="width:33%;">
+<div class="en">
+<p><img data-src="modules/luiza_logo_full_en.svg" style="width:100.0%" /></p>
+</div>
+<div class="sk">
+<p><img data-src="modules/luiza_logo_full.svg" style="width:100.0%" /></p>
+</div>
+</div>
+</div>
+</section>
+<section id="references-zdroje" class="title-slide slide level2">
+<h2><span class="en">References</span> <span class="sk">Zdroje</span></h2>
+<div id="refs" class="references csl-bib-body" role="doc-bibliography">
+<div id="ref-antipov2010applying" class="csl-entry" role="doc-biblioentry">
+[1] ANTIPOV, E. - POKRYSHEVSKAYA, E. Applying CHAID for logistic regression diagnostics and classification accuracy improvement. In <em>Journal of Targeting, Measurement and Analysis for Marketing</em>. 2010. Vol. 18, no. 2, s. 109–117.
+</div>
+<div id="ref-bengio2009learning" class="csl-entry" role="doc-biblioentry">
+[2] BENGIO, Y. Learning deep architectures for AI. In <em>Foundations and trends<span></span> in Machine Learning</em>. 2009. Vol. 2, no. 1, s. 1–127.
+</div>
+<div id="ref-grandvalet2004bagging" class="csl-entry" role="doc-biblioentry">
+[3] GRANDVALET, Y. Bagging equalizes influence. In <em>Machine Learning</em>. 2004. Vol. 55, no. 3, s. 251–270.
+</div>
+<div id="ref-ISLRv2" class="csl-entry" role="doc-biblioentry">
+[4] JAMES, G. et al. An Introduction to Statistical Learning. with Applications in R. In [online]. Second Edition. vyd.2021. Dostupné na internete: &lt;<a href="https://www.statlearning.com/">https://www.statlearning.com/</a>&gt;.
+</div>
+<div id="ref-python_forests" class="csl-entry" role="doc-biblioentry">
+[5] LEVY, J. Random Forests in Python. In [online]. [cit. 2014-11-03]. Dostupné na internete: &lt;<a href="http://blog.yhathq.com/posts/random-forests-in-python.html">http://blog.yhathq.com/posts/random-forests-in-python.html</a>&gt;.
+</div>
+<div id="ref-Spalek2005" class="csl-entry" role="doc-biblioentry">
+[6] SPALEK, J. et al. <em>Rozhodovanie a riadenie s podporou umelej inteligencie</em>. [s.l.]: Žilinská univerzita v Žiline/EDIS – vydavateľstvo ŽU, 2005. ISBN 80-8070-354-X.
+</div>
+</div>
+</section>
+</section>
+    </div>
+  </div>
+
+  <script src="./reveal/reveal.js/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: true,
+        // Display a presentation progress bar
+        progress: true,
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+        // Push each slide change to the browser history
+        history: true,
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+        // Enable the slide overview mode
+        overview: true,
+        // Vertical centering of slides
+        center: true,
+        // Enables touch navigation on devices with touch input
+        touch: true,
+        // see https://github.com/hakimel/reveal.js/#navigation-mode
+        navigationMode: 'default',
+        // Turns fragments on and off globally
+        fragments: true,
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+        // Transition style
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+        // Transition speed
+        transitionSpeed: 'default', // default/fast/slow
+        // Transition style for full page slide backgrounds
+        backgroundTransition: 'fade', // none/fade/slide/convex/concave/zoom
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+        width: 960,
+        height: 700,
+        math: {
+          mathjax: 'reveal/mathjax/tex-chtml.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+        menu: {
+          custom: [{
+            title: 'Printouts', icon: '<i class="fa fa-file-pdf">',
+            content: '<ul class="slide-menu-items"><li class="slide-menu-item"><a class="slide-menu-item-title" onclick="window.location.assign(updateURLParameter(window.location.href, \'print-pdf\', \'\'));">Printout w/o notes</a></li><li class="slide-menu-item"><a class="slide-menu-item-title" onclick="window.location.assign(updateURLParameter(updateURLParameter(window.location.href, \'print-pdf\', \'\'), \'showNotes\', \'separate-page\'));">Printout w/ notes</a></li></ul>'
+          }, {
+            title: 'About', icon: '<i class="fa fa-info"></i>', content: 
+            `<p class="slide-menu-item">
+                Instructions:<br>
+                Press '?' for keyboard shortcuts. To obtain a PDF-file of the slides open this <a href="?print-pdf" target="_blank">link</a> in Google Chrome and use the print dialog (this may not work for other browsers).
+                </p>
+                <span class="slide-menu-item">Author: <a href="https://github.com/rajgoel/reveal.js-plugins">Asvin Goel</a></span>`
+          }]
+        },
+        langs: {
+            langs: 'en:English,sk:Slovenčina'    
+        },
+        chalkboard: {
+            toggleChalkboardButton: { left: "210px", bottom: "30px", top: "auto", right: "auto" },
+            toggleNotesButton: { left: "182px", bottom: "30px", top: "auto", right: "auto" },
+        },
+        keyboard: {
+            39: function(event) {
+                if(event.shiftKey || Reveal.isOverview()) Reveal.navigateRight();
+                else Reveal.navigateNext();
+            }, // Right Arrow
+            37: function(event) {
+                if(event.shiftKey || Reveal.isOverview()) Reveal.navigateLeft();
+                else Reveal.navigatePrev();
+            },  // Left Arrow
+            78: function(event) {
+                if(Reveal.isOverview()) Reveal.navigateNext();
+                else Reveal.navigateRight();
+            }, // n key
+            80: function(event) {
+                if(Reveal.isOverview()) Reveal.navigatePrev();
+                else Reveal.navigateLeft();
+            }, // p key
+
+            // for chalkboard.js
+                        67: function() { RevealChalkboard.toggleNotesCanvas() }, // toggle notes canvas when 'c' is pressed
+	    66: function() { RevealChalkboard.toggleChalkboard() }, // toggle chalkboard when 'b' is pressed
+	    46: function() { RevealChalkboard.clear() },	// clear chalkboard when 'DEL' is pressed
+	     8: function() { RevealChalkboard.reset() },	// reset chalkboard data on current slide when 'BACKSPACE' is pressed
+	    68: function() { RevealChalkboard.download() },	// downlad recorded chalkboard drawing when 'd' is pressed
+	    88: function() { RevealChalkboard.colorNext() },	// cycle colors forward when 'x' is pressed
+	    89: function() { RevealChalkboard.colorPrev() },	// cycle colors backward when 'y' is pressed
+                    },
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: './reveal/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: './reveal/reveal.js/plugin/zoom-js/zoom.js', async: true },
+          { src: './reveal/reveal.js/plugin/math/math.js', async: true },
+          { src: './reveal/reveal.js/plugin/notes/notes.js', async: true },
+          { src: './reveal/reveal.js/plugin/menu/menu.js', async: true },
+          { src: './reveal/reveal.js/../lecture_js_plugins/langs/langs.js', async: true },
+          { src: './reveal/reveal.js/../lecture_js_plugins/overlays/overlays.js', async: false },
+          { src: './reveal/reveal.js/../lecture_js_plugins/scrollable_slides/scrollable_slides.js', async: false },
+          { src: './reveal/reveal.js/../lecture_js_plugins/styling_commands/styling_commands.js', async: false },
+          { src: './reveal/reveal.js/../lecture_js_plugins/plt_anim/plt_anim.js', async: false },
+          { src: './reveal/reveal.js/../lecture_js_plugins/chalkboard/chalkboard.js' },
+        ]
+      });
+    </script>
+    </body>
+</html>
